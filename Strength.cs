@@ -10,12 +10,12 @@ namespace FitnessApp
     {
         public List<Set> Sets { get; set; }
 
-        public Strength(string name) : base(name)
+        public Strength(int id, string name) : base(id, name)
         {
             Sets = new List<Set>();
         }
         
-        public Strength(string name, List<Set> sets) : base(name)
+        public Strength(int id, string name, List<Set> sets) : base(id, name)
         {
             Sets = sets;
         }

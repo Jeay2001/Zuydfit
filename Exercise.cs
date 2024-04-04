@@ -8,11 +8,13 @@ namespace FitnessApp
 {
     public abstract class Exercise
     {
+        public int Id { get; set; }
         public string Name { get; set; }
 
 
-        public Exercise(string name)
+        public Exercise(int id, string name)
         {
+            Id = id;
             Name = name;
         }
     }
