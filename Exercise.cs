@@ -4,12 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Zuydfit
+namespace FitnessApp
 {
-    public class Event
+    public abstract class Exercise
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Duration { get; set; }
+
+
+        public Exercise(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
     }
 }
