@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FitnessApp
+namespace Zuydfit
 {
     public class Strength : Exercise
     {
