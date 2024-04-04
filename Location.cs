@@ -21,6 +21,7 @@ namespace Zuydfit
             Name = name;
             StreetName = streetName;
             HouseNumber = houseNumber;
+
             PostalCode = postalCode;
             Machines = machines;
         }
