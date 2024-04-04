@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Zuydfit.DataAccessLayer;
 
 namespace Zuydfit
 {
@@ -24,6 +25,34 @@ namespace Zuydfit
             Id = id;
             Date = date;
             Exercises = exercises;
+        }
+
+        public static List<Workout> ReadWorkouts()
+        {
+            DAL dal = new DAL();
+            List<Workout> workouts = dal.ReadWorkouts();
+            return workouts;
+        }
+        
+        public Workout ReadWorkout(Workout workout)
+        {
+            DAL dal = new();
+            Workout returnedWorkout = dal.ReadWorkout(workout);
+            return returnedWorkout;
+        }
+
+        public Workout CreateWorkout(Workout workout)
+        {
+            DAL dal = new();
+            Workout createdWorkout = dal.CreateWorkout(workout);
+            return createdWorkout;
+        }
+
+        public Workout UpdateWorkout(Workout workout)
+        {
+            DAL dal = new DAL();
+            Workout returnedWorkout = dal.UpdateWorkout(workout);
+            return returnedWorkout;
         }
 
 
