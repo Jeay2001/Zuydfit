@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Zuydfit
+namespace FitnessApp
 {
-    public class Event
+    public class Set
     {
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Duration { get; set; }
+        public int Reps { get; set; }
+        public double Weight { get; set; }
+
     }
 }
