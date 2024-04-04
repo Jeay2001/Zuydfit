@@ -9,8 +9,6 @@ namespace Zuydfit.DataAccessLayer
     public class DAL
     {
 
-
-
         public Workout CreateWorkout(Workout workout)
         {
             // To do - create workout in DataBase
