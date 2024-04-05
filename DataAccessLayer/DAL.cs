@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Zuydfit.DataAccessLayer
 {
@@ -12,16 +13,13 @@ namespace Zuydfit.DataAccessLayer
     {
 
 
-        private string connectionString = "Server=sqlserverjeaysnijders.database.windows.net;Database=Zuydfit;User Id=Jeay2001;Password=Snijders2208@\r\n;";
+        //private string connectionString = "Server=sqlserverjeaysnijders.database.windows.net;Database=Zuydfit;User Id=Jeay2001;Password=Snijders2208@;";
 
         //private readonly string connectionString = "Data Source=.;Initial Catalog=KassaSysteem;Integrated Security=true";
+        //private readonly string connectionString = "Server=sqlserverjeaysnijders.database.windows.net;Database=Zuydfit;User Id=Jeay2001;Password=Snijders2208@;";
+        private readonly string connectionString = "Data Source=sqlserverjeaysnijders.database.windows.net; Initial Catalog = Zuydfit; User ID = Jeay2001; Password=Snijders2208@";
+
         public List<Workout> Workouts { get; set; } = new List<Workout>();
-
-
-
-
-
-
 
 
 
@@ -37,8 +35,7 @@ namespace Zuydfit.DataAccessLayer
 
             using SqlConnection connection = new(connectionString);
             connection.Open();
-            // Datum veranderen naar 'date' wanneer dit is aangepast in de database 
-            string productQuery = "SELECT Id, Datum FROM Workout";
+            string productQuery = "SELECT Id, Date FROM Workout";
             using SqlCommand command = new(productQuery, connection);
             using SqlDataReader reader = command.ExecuteReader();
 
