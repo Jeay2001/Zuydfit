@@ -1,19 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Zuydfit
 {
     public class Athlete : Person
     {
-        public List<Workout> Workouts { get; set; } = new List<Workout>();
-        public Location? Location { get; set; } // Hier '?' toegevoegd om de eigenschap nullable te maken
+        public List<Workout> Workouts { get; set; } = new List<Workout>(); 
+        public Location Location { get; set; } 
+        int WorkoutId { get; set; }
+        int LocationId { get; set; }
 
-        public Athlete(int id, string firstName, string lastName, string streetName, string houseNumber, string postalCode, List<Workout> workouts, Location? location) // Hier '?' toegevoegd om het type nullable te maken
-            : base(id, firstName, lastName, streetName, houseNumber, postalCode)
+
+        public Athlete(int id, string firstName, string lastName, string streetName, string houseNumber, string postalcode, List<Workout> workouts, Location Location)
+            : base(id, firstName, lastName, streetName, houseNumber, postalcode)
         {
             Workouts = workouts;
-            Location = location; // Toegewezen aan de eigenschap Location
+            Location = Location;
+        }
+        public Athlete(int id, string firstName, string lastName, string streetName, string houseNumber, string postalcode, int workoutid, int locaiotnid)
+            : base(id, firstName, lastName, streetName, houseNumber, postalcode)
+        {
+            WorkoutId = workoutid;
+            LocationId = locaiotnid;
         }
 
+        
     }
 }
