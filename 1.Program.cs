@@ -7,6 +7,7 @@ namespace Zuydfit
         static void Main(string[] args)
         {
             Console.WriteLine("Hello, World!");
+            Console.WriteLine("Test");
 
             List<Workout> workouts = Workout.ReadWorkouts();
             foreach(Workout workout in workouts)
