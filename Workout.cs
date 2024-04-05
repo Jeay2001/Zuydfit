@@ -10,17 +10,17 @@ namespace Zuydfit
     public class Workout
     {
         public int Id { get; set; }
-        public DateOnly Date { get; set; }
+        public DateTime Date { get; set; }
         public List<Exercise> Exercises { get; set; }
 
-        public Workout(int id, DateOnly date)
+        public Workout(int id, DateTime date)
         {
             Id = id;
             Date = date;
             Exercises = new List<Exercise>();
         }
 
-        public Workout(int id, DateOnly date, List<Exercise> exercises)
+        public Workout(int id, DateTime date, List<Exercise> exercises)
         {
             Id = id;
             Date = date;
