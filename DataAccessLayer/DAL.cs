@@ -12,16 +12,9 @@ namespace Zuydfit.DataAccessLayer
     public class DAL
     {
 
-
-        //private string connectionString = "Server=sqlserverjeaysnijders.database.windows.net;Database=Zuydfit;User Id=Jeay2001;Password=Snijders2208@;";
-
-        //private readonly string connectionString = "Data Source=.;Initial Catalog=KassaSysteem;Integrated Security=true";
-        //private readonly string connectionString = "Server=sqlserverjeaysnijders.database.windows.net;Database=Zuydfit;User Id=Jeay2001;Password=Snijders2208@;";
         private readonly string connectionString = "Data Source=sqlserverjeaysnijders.database.windows.net; Initial Catalog = Zuydfit; User ID = Jeay2001; Password=Snijders2208@";
 
         public List<Workout> Workouts { get; set; } = new List<Workout>();
-
-
 
 
         public Workout CreateWorkout(Workout workout)
@@ -50,12 +43,7 @@ namespace Zuydfit.DataAccessLayer
                 //string description = reader[3].ToString();
                 //string type = reader[4].ToString();
 
-                //string length = reader[5].ToString();
-                //string width = reader[6].ToString();
-                //string height = reader[7].ToString();
-
                 Console.WriteLine($"Id: {id}");
-                //Console.WriteLine($"Data: {date}");
                 //Product product = new Item(id, name, price, description, length, width, height);
                 //Products.Add(product);
             }
