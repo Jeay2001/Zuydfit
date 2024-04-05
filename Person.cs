@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Zuydfit.DataAccessLayer;
 
 namespace Zuydfit
 {
@@ -17,14 +18,20 @@ namespace Zuydfit
         public string PostalCode { get; set; }
 
         // Constructor
-        public Person(int id, string firstName, string lastName, string streetName, string houseNumber, string postalCode)
+        public Person(int id, string firstName, string lastName, string streetName, string houseNumber, string postalcode)
         {
             Id = id;
             FirstName = firstName;
             LastName = lastName;
             StreetName = streetName;
             HouseNumber = houseNumber;
-            PostalCode = postalCode;
+            PostalCode = postalcode;
+        }
+
+        public static List<Person> GetPersons() 
+        {
+            DAL dal = new DAL();
+            return dal.GetPerson();
         }
     }
 }
