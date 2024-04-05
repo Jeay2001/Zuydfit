@@ -9,70 +9,71 @@ namespace Zuydfit
             Console.WriteLine("Hello, World!");
 
             List<Workout> workouts = Workout.ReadWorkouts();
-            foreach(Workout workout in workouts)
+            foreach (Workout workout in workouts)
             {
-                Console.WriteLine(workout.Id);
-                Console.WriteLine(workout.Date);
+                //Console.WriteLine($"Workout ID: {workout.Id}");
+                //Console.WriteLine($"Date: {workout.Date}");
+                //Console.WriteLine("Exercises:");
                 foreach (Exercise exercise in workout.Exercises)
                 {
-                    Console.WriteLine(exercise.Name);
+                    //Console.WriteLine($"Exercise Name: {exercise.Name}");
                     if (exercise is Cardio)
                     {
                         Cardio cardio = (Cardio)exercise;
-                        Console.WriteLine(cardio.Duration);
+                        //Console.WriteLine($"Duration: {cardio.Duration} minutes");
+                        //Console.WriteLine($"Distance: {cardio.Distance} miles");
                     }
                     else if (exercise is Strength)
                     {
                         Strength strength = (Strength)exercise;
                         foreach (Set set in strength.Sets)
                         {
-                            Console.WriteLine(set.Reps);
-                            Console.WriteLine(set.Weight);
+                            //Console.WriteLine($"Reps: {set.Reps}");
+                            //Console.WriteLine($"Weight: {set.Weight} lbs");
                         }
                     }
                 }
+                Console.WriteLine();
             }
 
             List<Person> persons = Person.GetPersons();
-            foreach(Person person in persons)
+            foreach (Person person in persons)
             {
-                Console.WriteLine(person.Id);
-                Console.WriteLine(person.FirstName);
-                Console.WriteLine(person.LastName);
-                Console.WriteLine(person.StreetName);
-                Console.WriteLine(person.HouseNumber);
-                Console.WriteLine(person.PostalCode);
+                Console.WriteLine($"Person ID: {person.Id}");
+                Console.WriteLine($"Name: {person.FirstName} {person.LastName}");
+                Console.WriteLine($"Address: {person.StreetName} {person.HouseNumber}, {person.PostalCode}");
                 if (person is Athlete)
                 {
                     Athlete athlete = (Athlete)person;
+                    Console.WriteLine("Workouts:");
                     foreach (Workout workout in athlete.Workouts)
                     {
-                        Console.WriteLine(workout.Id);
-                        Console.WriteLine(workout.Date);
+                        Console.WriteLine($"Workout ID: {workout.Id}");
+                        Console.WriteLine($"Date: {workout.Date}");
+                        Console.WriteLine("Exercises:");
                         foreach (Exercise exercise in workout.Exercises)
                         {
-                            Console.WriteLine(exercise.Name);
+                            Console.WriteLine($"Exercise Name: {exercise.Name}");
                             if (exercise is Cardio)
                             {
                                 Cardio cardio = (Cardio)exercise;
-                                Console.WriteLine(cardio.Duration);
-                                Console.WriteLine(cardio.Distance);
+                                Console.WriteLine($"Duration: {cardio.Duration} minutes");
+                                Console.WriteLine($"Distance: {cardio.Distance} miles");
                             }
                             else if (exercise is Strength)
                             {
                                 Strength strength = (Strength)exercise;
                                 foreach (Set set in strength.Sets)
                                 {
-                                    Console.WriteLine(set.Reps);
-                                    Console.WriteLine(set.Weight);
+                                    Console.WriteLine($"Reps: {set.Reps}");
+                                    Console.WriteLine($"Weight: {set.Weight} lbs");
                                 }
                             }
                         }
                     }
                 }
+                Console.WriteLine();
             }
-
-
         }
     }
    
