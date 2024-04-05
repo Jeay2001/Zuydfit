@@ -143,7 +143,7 @@ namespace Zuydfit.DataAccessLayer
             { 
                 connection.Open();
 
-                string productQuery = "SELECT * PostalCode FROM Person";
+                string productQuery = "SELECT * FROM Person";
 
                 using (SqlCommand command = new SqlCommand(productQuery, connection))
                 {
@@ -151,27 +151,26 @@ namespace Zuydfit.DataAccessLayer
                     {
                         while (reader.Read())
                         {
-                            Console.WriteLine(reader[5].ToString());
                             int personid = Convert.ToInt32(reader[0]);
-                            //string firstname = reader[1].ToString();
-                            //string lastname = reader[2].ToString();
-                            //string streetname = reader[3].ToString();
-                            //string housenumber = reader[4].ToString();
-                            //string postalcode = reader[5].ToString();
-                            //string type = reader[6].ToString();
-                            
-                            //if(type == "Athlete")
-                            //{
-                            //    int locationid = Convert.ToInt32(reader[7]);
-                            //    int workoutid = Convert.ToInt32(reader[8]);
-                            //    Person person = new Athlete(personid, firstname, lastname, streetname, housenumber, postalcode, locationid, workoutid);
-                            //    persons.Add(person);
-                            //}
-                            //else if(type == "Coach")
-                            //{
-                            //    Person person = new Coach(personid, firstname, lastname, streetname, housenumber, postalcode);
-                            //    persons.Add(person);
-                            //}
+                            string firstname = reader[1].ToString();
+                            string lastname = reader[2].ToString();
+                            string streetname = reader[3].ToString();
+                            string housenumber = reader[4].ToString();
+                            string postalcode = reader[5].ToString();
+                            string type = reader[6].ToString();
+
+                            if (type == "Athlete")
+                            {
+                                int locationid = Convert.ToInt32(reader[7]);
+                                int workoutid = Convert.ToInt32(reader[8]);
+                                Person person = new Athlete(personid, firstname, lastname, streetname, housenumber, postalcode, locationid, workoutid);
+                                persons.Add(person);
+                            }
+                            else if (type == "Coach")
+                            {
+                                Person person = new Coach(personid, firstname, lastname, streetname, housenumber, postalcode);
+                                persons.Add(person);
+                            }
                         }
                     }
                 }
