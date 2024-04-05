@@ -8,10 +8,10 @@ namespace Zuydfit
 {
     public class Cardio : Exercise
     {
-        public int Duration { get; set; }
-        public int Distance { get; set; }
+        public string Duration { get; set; }
+        public string Distance { get; set; }
 
-        public Cardio(int id, string name, int duration, int distance) : base(id, name)
+        public Cardio(int id, string name, string duration, string distance) : base(id, name)
         {
             Duration = duration;
             Distance = distance;

@@ -20,7 +20,6 @@ namespace Zuydfit
                     {
                         Cardio cardio = (Cardio)exercise;
                         Console.WriteLine(cardio.Duration);
-                        Console.WriteLine(cardio.Distance);
                     }
                     else if (exercise is Strength)
                     {
