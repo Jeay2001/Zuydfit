@@ -93,7 +93,7 @@ namespace Zuydfit.DataAccessLayer
                     string distance = Convert.ToString(reader[5]);
                     if (previousExercise.Id != exerciseId)
                     {
-                        Cardio cardioExercise = new Cardio(exerciseId,name,duration, distance);
+                        Cardio cardioExercise = new Cardio(exerciseId, name, duration, distance);
                         previousWorkout.Exercises.Add(cardioExercise);
                         previousExercise = cardioExercise;
                     }
