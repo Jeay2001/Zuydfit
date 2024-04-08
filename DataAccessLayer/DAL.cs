@@ -119,25 +119,6 @@ namespace Zuydfit.DataAccessLayer
         }
 
 
-        public Workout ReadWorkout(Workout workout)
-        {
-            // To do - read workout from DataBase
-            return workout;
-        }
-
-        public Workout UpdateWorkout(Workout workout)
-        {
-            // To do - update workout in DataBase
-            return workout;
-        }
-
-        public bool DeleteWorkout(Workout workout)
-        {
-            // To do - delete workout in DataBase
-            return true;
-        }
-
-
         /// <summary>
         /// Get a list of persons from the database.
         /// </summary>
