@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using Zuydfit;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Zuydfit.DataAccessLayer
@@ -119,6 +120,96 @@ namespace Zuydfit.DataAccessLayer
         }
 
 
+        public Workout ReadWorkout(Workout workout)
+        {
+            // To do - read workout from DataBase
+            return workout;
+        }
+
+        public Workout UpdateWorkout(Workout workout)
+        {
+            // To do - update workout in DataBase
+            return workout;
+        }
+
+        public bool DeleteWorkout(Workout workout)
+        {
+            // To do - delete workout in DataBase
+            return true;
+        }
+        public Activity CreateActivity(Activity activity)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "INSERT INTO Activity (Name, Duration) VALUES (@Name, @Duration); SELECT SCOPE_IDENTITY();";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Name", activity.Name);
+                    command.Parameters.AddWithValue("@Duration", activity.Duration); // Sla de duur op als totaal aantal seconden
+                    int activityId = Convert.ToInt32(command.ExecuteScalar());
+                    activity.Id = activityId;
+                    return activity;
+                }
+            }
+        }
+        public Activity ReadActivity(int id)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "SELECT Id, Name, Duration FROM Activity WHERE Id = @Id";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", id);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            string name = reader["Name"].ToString();
+                            string duration = reader["Duration"].ToString();
+                            Activity activity = new Activity(id, name, duration, new List<Athlete>());
+                            return activity;
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                }
+            }
+        }
+
+        public Activity UpdateActivity(Activity activity)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "UPDATE Activity SET Name = @Name, Duration = @Duration WHERE Id = @Id";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Name", activity.Name);
+                    command.Parameters.AddWithValue("@Duration", activity.Duration);
+                    command.Parameters.AddWithValue("@Id", activity.Id);
+                    command.ExecuteNonQuery();
+                    return activity;
+                }
+            }
+        }
+
+        public void DeleteActivity(Activity activity)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "DELETE FROM Activity WHERE Id = @Id";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", activity.Id);
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
         /// <summary>
         /// Get a list of persons from the database.
         /// </summary>
@@ -283,5 +374,6 @@ namespace Zuydfit.DataAccessLayer
                 throw;
             }
         }
+
     }
 }

@@ -8,8 +8,8 @@ namespace Zuydfit
 {
     public class Athlete : Person
     {
-        public List<Workout> Workouts { get; set; } = new List<Workout>();
-        public Location Location { get; set; }
+        public List<Workout> Workouts { get; set; } = new List<Workout>(); 
+        public Location Location { get; set; } 
         public int WorkoutId { get; set; }
         public int LocationId { get; set; }
 
@@ -27,6 +27,6 @@ namespace Zuydfit
             LocationId = locationid;
         }
 
-
+        
     }
 }

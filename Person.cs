@@ -33,7 +33,7 @@ namespace Zuydfit
             DAL dal = new DAL();
             return dal.GetPerson();
         }
-
+        
         public void UpdatePerson()
         {
             DAL dal = new DAL();
