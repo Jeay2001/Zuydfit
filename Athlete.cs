@@ -10,8 +10,8 @@ namespace Zuydfit
     {
         public List<Workout> Workouts { get; set; } = new List<Workout>(); 
         public Location Location { get; set; } 
-        int WorkoutId { get; set; }
-        int LocationId { get; set; }
+        public int WorkoutId { get; set; }
+        public int LocationId { get; set; }
 
 
         public Athlete(int id, string firstName, string lastName, string streetName, string houseNumber, string postalcode, List<Workout> workouts, Location Location)
