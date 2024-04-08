@@ -28,7 +28,7 @@ namespace Zuydfit
             PostalCode = postalcode;
         }
 
-        public static List<Person> GetPersons() 
+        public static List<Person> GetPersons()
         {
             DAL dal = new DAL();
             return dal.GetPerson();
