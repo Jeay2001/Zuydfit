@@ -18,6 +18,10 @@ namespace Zuydfit
             Name = name;
         }
 
+        public Machine()
+        {
+        }
+
         public static List<Machine> ReadMachines()
         {
             DAL dal = new DAL();
