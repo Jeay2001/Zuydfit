@@ -15,7 +15,7 @@ namespace Zuydfit
         public Coach(int id, string firstName, string lastName, string streetName, string houseNumber, string postalcode)
             : base(id, firstName, lastName, streetName, houseNumber, postalcode)
         {
-            // Geen extra initialisatie nodig hier
         }
+
     }
 }

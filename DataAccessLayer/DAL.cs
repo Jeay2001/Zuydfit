@@ -7,6 +7,7 @@ using System.Numerics;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Zuydfit;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Zuydfit.DataAccessLayer
@@ -85,6 +86,10 @@ namespace Zuydfit.DataAccessLayer
                         previousStrengthExercise.Sets.Add(set);
 
                     }
+
+
+                    //int? machineId = Convert.ToInt32(reader[5]);
+
                 }
                 else if (type.ToLower() == "cardio")
                 {
@@ -234,13 +239,89 @@ namespace Zuydfit.DataAccessLayer
             }
 
         }
+        public Activity CreateActivity(Activity activity)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "INSERT INTO Activity (Name, Duration) VALUES (@Name, @Duration); SELECT SCOPE_IDENTITY();";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Name", activity.Name);
+                    command.Parameters.AddWithValue("@Duration", activity.Duration); // Sla de duur op als totaal aantal seconden
+                    int activityId = Convert.ToInt32(command.ExecuteScalar());
+                    activity.Id = activityId;
+                    return activity;
+                }
+            }
+        }
+        public Activity ReadActivity(int id)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "SELECT Id, Name, Duration FROM Activity WHERE Id = @Id";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", id);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            string name = reader["Name"].ToString();
+                            string duration = reader["Duration"].ToString();
+                            Activity activity = new Activity(id, name, duration, new List<Athlete>());
+                            return activity;
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                }
+            }
+        }
 
-        public  List<Person> GetPerson()
+        public Activity UpdateActivity(Activity activity)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "UPDATE Activity SET Name = @Name, Duration = @Duration WHERE Id = @Id";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Name", activity.Name);
+                    command.Parameters.AddWithValue("@Duration", activity.Duration);
+                    command.Parameters.AddWithValue("@Id", activity.Id);
+                    command.ExecuteNonQuery();
+                    return activity;
+                }
+            }
+        }
+
+        public void DeleteActivity(Activity activity)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "DELETE FROM Activity WHERE Id = @Id";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", activity.Id);
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+        /// <summary>
+        /// Get a list of persons from the database.
+        /// </summary>
+        /// <returns></returns>
+        public List<Person> GetPerson()
         {
             List<Person> persons = new List<Person>();
 
-            using (SqlConnection connection = new SqlConnection(connectionString)) 
-            { 
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
                 connection.Open();
 
                 string productQuery = "SELECT * FROM Person";
@@ -276,8 +357,125 @@ namespace Zuydfit.DataAccessLayer
                 }
             }
 
-                return persons;
+            return persons;
 
         }
+
+        /// <summary>
+        /// Create a person in the database.
+        /// </summary>
+        public void CreatePerson(Person person)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "INSERT INTO Person (Firstname, Lastname, Streetname, Housenumber, Postalcode, Type, LocationId, WorkoutId) " +
+                    "VALUES (@Firstname, @Lastname, @Streetname, @Housenumber, @Postalcode, @Type, @LocationId, @WorkoutId) SELECT SCOPE_IDENTITY()";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Firstname", person.FirstName);
+                    command.Parameters.AddWithValue("@Lastname", person.LastName);
+                    command.Parameters.AddWithValue("@Streetname", person.StreetName);
+                    command.Parameters.AddWithValue("@Housenumber", person.HouseNumber);
+                    command.Parameters.AddWithValue("@Postalcode", person.PostalCode);
+
+                    //indicate in the program whether it is a coach or an athlete
+                    if (person is Athlete athlete)
+                    {
+                        command.Parameters.AddWithValue("@LocationId", athlete.LocationId);
+                        command.Parameters.AddWithValue("@WorkoutId", athlete.WorkoutId);
+                        command.Parameters.AddWithValue("@Type", "Athlete");
+                    }
+                    else if (person is Coach)
+                    {
+                        command.Parameters.AddWithValue("@LocationId", DBNull.Value);
+                        command.Parameters.AddWithValue("@WorkoutId", DBNull.Value);
+                        command.Parameters.AddWithValue("@Type", "Coach");
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Invalid person type.");
+                    }
+
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Update a person in the database.
+        /// </summary>
+        /// <param name="person"></param>
+        /// <exception cref="ArgumentException"></exception>
+        public void UpdatePerson(Person person)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                try
+                {
+                    string query = "UPDATE Person SET Firstname = @Firstname, Lastname = @Lastname, Streetname = @Streetname, Housenumber = @Housenumber, Postalcode = @Postalcode, Type = @Type, LocationId = @locationId, WorkoutId = @WorkoutId WHERE Id = @Id";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Firstname", person.FirstName);
+                        command.Parameters.AddWithValue("@Lastname", person.LastName);
+                        command.Parameters.AddWithValue("@Streetname", person.StreetName);
+                        command.Parameters.AddWithValue("@Housenumber", person.HouseNumber);
+                        command.Parameters.AddWithValue("@Postalcode", person.PostalCode);
+                        if (person is Athlete athlete)
+                        {
+                            command.Parameters.AddWithValue("@LocationId", athlete.LocationId);
+                            command.Parameters.AddWithValue("@WorkoutId", athlete.WorkoutId);
+                            command.Parameters.AddWithValue("@Type", "Athlete");
+                        }
+                        else if (person is Coach)
+                        {
+                            command.Parameters.AddWithValue("@LocationId", DBNull.Value);
+                            command.Parameters.AddWithValue("@WorkoutId", DBNull.Value);
+                            command.Parameters.AddWithValue("@Type", "Coach");
+                        }
+                        else
+                        {
+                            throw new ArgumentException("Invalid person type.");
+                        }
+                        command.Parameters.AddWithValue("@Id", person.Id);
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("An error occurred while updating the product: " + ex.Message);
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Deletes a person from the database.
+        /// </summary>
+        public void DeletePerson(Person person)
+        {
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+
+                    // Delete associated orderlines first
+                    string DeletePersonquery = "DELETE FROM Person WHERE Id = @id";
+                    using (SqlCommand deletepersoncommand = new SqlCommand(DeletePersonquery, connection))
+                    {
+                        deletepersoncommand.Parameters.AddWithValue("@id", person.Id);
+                        deletepersoncommand.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred while deleting the product: " + ex.Message);
+                throw;
+            }
+        }
+
     }
 }

@@ -28,10 +28,28 @@ namespace Zuydfit
             PostalCode = postalcode;
         }
 
-        public static List<Person> GetPersons() 
+        public static List<Person> GetPersons()
         {
             DAL dal = new DAL();
             return dal.GetPerson();
+        }
+        
+        public void UpdatePerson()
+        {
+            DAL dal = new DAL();
+            dal.UpdatePerson(this);
+        }
+
+        public void DeletePerson()
+        {
+            DAL dal = new DAL();
+            dal.DeletePerson(this);
+        }
+
+        public void CreatePerson()
+        {
+            DAL dal = new DAL();
+            dal.CreatePerson(this);
         }
     }
 }

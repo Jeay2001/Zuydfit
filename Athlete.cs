@@ -17,7 +17,7 @@ namespace Zuydfit
             : base(id, firstName, lastName, streetName, houseNumber, postalcode)
         {
             Workouts = workouts;
-            Location = Location;
+            Location = location;
         }
 
 

@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using Zuydfit;
+using Zuydfit.DataAccessLayer;
 
 namespace Zuydfit
 {
@@ -9,7 +10,7 @@ namespace Zuydfit
     {
         static void Main(string[] args)
         {
-            //Console.WriteLine("Hello, World!");
+            Console.WriteLine("Hello, World!");
 
             //List<Workout> workouts = Workout.ReadWorkouts();
             //PrintWorkouts(workouts);
