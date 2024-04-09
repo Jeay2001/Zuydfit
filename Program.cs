@@ -27,23 +27,48 @@ namespace Zuydfit
             //}
 
 
-            //Workout workout = new Workout(3, DateTime.Now);
 
+            //List<Workout> workouts = Workout.ReadWorkouts();
+            //Workout workout = workouts[0];
 
-            //List<Workout> workoutList = Workout.ReadWorkouts();
-            //foreach (Workout w in workoutList)
-            //{
-            //    Console.WriteLine(w.Id);
-            //}
-            //Workout.DeleteWorkout(workout);
-            //workoutList = Workout.ReadWorkouts();
-            //foreach (Workout w in workoutList)
-            //{
-            //    Console.WriteLine(w.Id);
-            //}
+            //workout.Exercises.Add(new Cardio(1,"Running", "30 minutes", "5 km"));
 
-            //workout.CreateWorkout(workout);
+            Location location = new Location(1, "locatie 1", "straatnaam", "huisnummer", "1837jd", []);
+            Athlete athlete = new Athlete(1, "John", "Doe", "Street", "1", "1234", [], location);
 
+            List<Exercise> exercises = Exercise.ReadExerciseListFromAthlete(athlete);
+
+            foreach (Exercise exercise in exercises)
+            {
+                Console.WriteLine($"Exercise: {exercise.Name}");
+
+                if (exercise is Cardio)
+                {
+                    Cardio cardio = (Cardio)exercise;
+                    Console.WriteLine($"  Type: Cardio");
+                    if (cardio.Duration != "")
+                    {
+                        Console.WriteLine($"  Duration: {cardio.Duration}");
+                    }
+                    if (cardio.Distance != "")
+                    {
+                        Console.WriteLine($"  Distance: {cardio.Distance}");
+                    }
+                }
+                else if (exercise is Strength)
+                {
+                    Strength strength = (Strength)exercise;
+                    if (strength.Sets.Count > 0)
+                    {
+                        Console.WriteLine("  Sets:");
+                        foreach (Set set in strength.Sets)
+                        {
+                            Console.WriteLine($"    - Weight: {set.Weight} Reps: {set.Reps}");
+                        }
+                    }
+                }
+                Console.WriteLine();
+            }
         }
 
 
