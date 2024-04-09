@@ -421,9 +421,9 @@ namespace Zuydfit.DataAccessLayer
                 connection.Open();
                 // Zorg ervoor dat de SQL-instructie alle benodigde kolommen bevat.
                 string sql = @"
-            INSERT INTO Location (Name, StreetName, HouseNumber, PostalCode) 
-            VALUES (@Name, @StreetName, @HouseNumber, @PostalCode); 
-            SELECT SCOPE_IDENTITY();";
+                    INSERT INTO Location (Name, StreetName, HouseNumber, PostalCode) 
+                    VALUES (@Name, @StreetName, @HouseNumber, @PostalCode); 
+                    SELECT SCOPE_IDENTITY();";
 
                 SqlCommand command = new SqlCommand(sql, connection);
                 command.Parameters.AddWithValue("@Name", location.Name);
@@ -437,17 +437,28 @@ namespace Zuydfit.DataAccessLayer
 
             return location;
         }
-
-        public Location UpdateLocation(Location location)
+        public bool DeleteLocation(int locationId)
         {
+            int rowsAffected = 0;
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string sql = "UPDATE Location SET Name = @Name WHERE Id = @Id";
-                SqlCommand command = new SqlCommand(sql, connection);
-                command.Parameters.AddWithValue("@Id", location.Id);
-                command.Parameters.AddWithValue("@Name", location.Name);
+                string sqlDeleteRelated = "DELETE FROM Person WHERE LocationId = @LocationId";
+                SqlCommand commandDeleteRelated = new SqlCommand(sqlDeleteRelated, connection);
+                commandDeleteRelated.Parameters.AddWithValue("@LocationId", locationId);
 
+                // Verwijder eerst alle gerelateerde personen
+                commandDeleteRelated.ExecuteNonQuery();
+
+                // Probeer daarna de locatie te verwijderen
+                string sqlDeleteLocation = "DELETE FROM Location WHERE Id = @Id";
+                SqlCommand commandDeleteLocation = new SqlCommand(sqlDeleteLocation, connection);
+                commandDeleteLocation.Parameters.AddWithValue("@Id", locationId);
+
+                rowsAffected = commandDeleteLocation.ExecuteNonQuery();
+            }
+
+            return rowsAffected > 0;
         }
 
         /// <summary>
@@ -566,35 +577,21 @@ namespace Zuydfit.DataAccessLayer
             }
         }
 
-                command.ExecuteNonQuery();
-            }
-
-            return location;
-        }
-
-        public bool DeleteLocation(int locationId)
+        public Location UpdateLocation(Location location)
         {
-            int rowsAffected = 0;
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string sqlDeleteRelated = "DELETE FROM Person WHERE LocationId = @LocationId";
-                SqlCommand commandDeleteRelated = new SqlCommand(sqlDeleteRelated, connection);
-                commandDeleteRelated.Parameters.AddWithValue("@LocationId", locationId);
-
-                // Verwijder eerst alle gerelateerde personen
-                commandDeleteRelated.ExecuteNonQuery();
-
-                // Probeer daarna de locatie te verwijderen
-                string sqlDeleteLocation = "DELETE FROM Location WHERE Id = @Id";
-                SqlCommand commandDeleteLocation = new SqlCommand(sqlDeleteLocation, connection);
-                commandDeleteLocation.Parameters.AddWithValue("@Id", locationId);
-
-                rowsAffected = commandDeleteLocation.ExecuteNonQuery();
+                string sql = "UPDATE Location SET Name = @Name, Streetname = @Streetname, Housenumber = @Housenumber, Postalcode = @Postalcode WHERE Id = @Id";
+                SqlCommand command = new SqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@Id", location.Id);
+                command.Parameters.AddWithValue("@Name", location.Name);
+                command.Parameters.AddWithValue("@Streetname", location.StreetName);
+                command.Parameters.AddWithValue("@Housenumber", location.HouseNumber);
+                command.Parameters.AddWithValue("@Postalcode", location.PostalCode);
+                command.ExecuteNonQuery();
             }
-
-            return rowsAffected > 0;
+            return location;
         }
-
     }
 }
