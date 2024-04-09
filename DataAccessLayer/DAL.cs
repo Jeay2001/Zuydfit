@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -19,7 +20,17 @@ namespace Zuydfit.DataAccessLayer
 
         public Workout CreateWorkout(Workout workout)
         {
-            // To do - create workout in DataBase
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "INSERT INTO Workout (Date) VALUES (@Date); SELECT SCOPE_IDENTITY();";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Date", workout.Date);
+                    int workoutId = Convert.ToInt32(command.ExecuteScalar());
+                    workout.Id = workoutId;
+                }
+            }
             return workout;
         }
 
@@ -83,10 +94,6 @@ namespace Zuydfit.DataAccessLayer
                         previousStrengthExercise.Sets.Add(set);
 
                     }
-
-
-                    //int? machineId = Convert.ToInt32(reader[5]);
-
                 } else if (type.ToLower() == "cardio")
                 {
                     string duration = Convert.ToString(reader[4]);
@@ -98,19 +105,6 @@ namespace Zuydfit.DataAccessLayer
                         previousExercise = cardioExercise;
                     }
                 }   
-
-                //Console.WriteLine("Type");
-                //Console.WriteLine(type);
-                //Exercise exercise = new Exercise(exerciseId, name, duration, type);
-
-
-
-
-
-                //Console.WriteLine($"Id: {id}");
-                //Console.WriteLine($"Date: {date}");
-                //Workout workout = new Workout(id, date);
-                //Workouts.Add(workout);
 
             }
             return Workouts;
@@ -131,8 +125,25 @@ namespace Zuydfit.DataAccessLayer
 
         public bool DeleteWorkout(Workout workout)
         {
-            // To do - delete workout in DataBase
-            return true;
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string query = "DELETE from workout where id = (@Id);";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", workout.Id);
+                        command.ExecuteNonQuery();
+                    }
+                }
+                Console.WriteLine($"Deleted row with id {workout.Id}");
+                return true;
+            } catch
+            {
+                return false;
+            }
+
         }
 
         public  List<Person> GetPerson()

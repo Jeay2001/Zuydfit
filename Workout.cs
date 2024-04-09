@@ -55,6 +55,13 @@ namespace Zuydfit
             return returnedWorkout;
         }
 
+        public static bool DeleteWorkout(Workout workout)
+        {
+            DAL dal = new DAL();
+            bool status = dal.DeleteWorkout(workout);
+            return status;
+        }
+
 
     }
 }
