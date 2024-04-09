@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Zuydfit.DataAccessLayer;
 
 namespace Zuydfit
 {
@@ -15,6 +16,13 @@ namespace Zuydfit
         {
             Id = id;
             Name = name;
+        }
+
+        public static List<Exercise> ReadExerciseListFromAthlete(Athlete athlete)
+        {
+            DAL dal = new DAL();
+            List<Exercise> exercises = dal.ReadExerciseListFromAthlete(athlete);
+            return exercises;
         }
     }
 }

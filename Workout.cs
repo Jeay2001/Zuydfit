@@ -27,10 +27,10 @@ namespace Zuydfit
             Exercises = exercises;
         }
 
-        public static List<Workout> ReadWorkouts()
+        public static List<Workout> ReadWorkouts(Athlete athlete)
         {
             DAL dal = new DAL();
-            List<Workout> workouts = dal.ReadWorkouts();
+            List<Workout> workouts = dal.ReadWorkouts(athlete);
             return workouts;
         }
         
@@ -53,6 +53,13 @@ namespace Zuydfit
             DAL dal = new DAL();
             Workout returnedWorkout = dal.UpdateWorkout(workout);
             return returnedWorkout;
+        }
+
+        public static bool DeleteWorkout(Workout workout)
+        {
+            DAL dal = new DAL();
+            bool status = dal.DeleteWorkout(workout);
+            return status;
         }
 
 
