@@ -26,15 +26,23 @@ namespace Zuydfit
 
             //}
 
+            Location location = new Location(1, "locatie 1", "straatnaam", "huisnummer", "1837jd", []);
+            Athlete athlete = new Athlete(1, "John", "Doe", "Street", "1", "1234", [], location);
 
 
-            //List<Workout> workouts = Workout.ReadWorkouts();
+
+            List<Workout> workouts = Workout.ReadWorkouts(athlete);
+
+            foreach (Workout workout in workouts)
+            {
+                Console.WriteLine($"Workout Date: {workout.Date.ToString("dd/MM/yyyy")}");
+            }
+
+
             //Workout workout = workouts[0];
 
             //workout.Exercises.Add(new Cardio(1,"Running", "30 minutes", "5 km"));
 
-            Location location = new Location(1, "locatie 1", "straatnaam", "huisnummer", "1837jd", []);
-            Athlete athlete = new Athlete(1, "John", "Doe", "Street", "1", "1234", [], location);
 
             List<Exercise> exercises = Exercise.ReadExerciseListFromAthlete(athlete);
 
