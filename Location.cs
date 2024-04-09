@@ -16,6 +16,16 @@ namespace Zuydfit
         public string PostalCode { get; set; }
         public List<Machine> Machines { get; set; }
 
+
+        public Location(int id, string name, string streetName, string houseNumber, string postalCode)
+        {
+            Id = id;
+            Name = name;
+            StreetName = streetName;
+            HouseNumber = houseNumber;
+            PostalCode = postalCode;
+        }
+
         public Location(int id, string name, string streetName, string houseNumber, string postalCode, List<Machine> machines)
         {
             Id = id;
@@ -45,7 +55,7 @@ namespace Zuydfit
         {
             DAL dal = new();
             Location returnedLocation = dal.CreateLocation(location);
-            return createdLocation;
+            return returnedLocation; 
         }
 
         public Location UpdateLocation(Location location)

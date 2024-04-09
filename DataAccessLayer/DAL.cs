@@ -255,8 +255,210 @@ namespace Zuydfit.DataAccessLayer
                 }
             }
 
-            return persons;
+                return persons;
+        }
 
+        
+        public List<Machine> Machines { get; set; } = new List<Machine>();
+        public List<Machine> ReadMachines()
+        {
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = "SELECT Id, Name FROM Machine"; 
+                SqlCommand command = new SqlCommand(sql, connection);
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Machines.Add(new Machine(reader.GetInt32(0), reader.GetString(1)));
+                    }
+                }
+            }
+
+            return Machines;
+        }
+
+        public Machine ReadMachine(int machineId)
+        {
+            Machine machine = null;
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = "SELECT Id, Name FROM Machine WHERE Id = @machineId";
+                SqlCommand command = new SqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@machineId", machineId);
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        machine = new Machine(reader.GetInt32(0), reader.GetString(1));
+                    }
+                }
+            }
+
+            return machine;
+        }
+
+        public Machine CreateMachine(Machine machine)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = "INSERT INTO Machine (Name) VALUES (@Name); SELECT SCOPE_IDENTITY();";
+                SqlCommand command = new SqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@Name", machine.Name);
+
+                // Uitvoeren van het commando en ophalen van de nieuwe ID
+                object result = command.ExecuteScalar();
+                if (result != null)
+                {
+                    machine.Id = Convert.ToInt32(result);
+                }
+            }
+
+            return machine;
+        }
+
+        public Machine UpdateMachine(Machine machine)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = "UPDATE Machine SET Name = @Name WHERE Id = @Id";
+                SqlCommand command = new SqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@Id", machine.Id);
+                command.Parameters.AddWithValue("@Name", machine.Name);
+
+                command.ExecuteNonQuery();
+            }
+
+            return machine;
+        }
+
+        public bool DeleteMachine(Machine machine)
+        {
+            int rowsAffected = 0;
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = "DELETE FROM Machine WHERE Id = @Id";
+                SqlCommand command = new SqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@Id", machine.Id);
+
+                rowsAffected = command.ExecuteNonQuery();
+            }
+
+            return rowsAffected > 0;
+        }
+
+
+
+
+        public List<Location> ReadLocations()
+        {
+            List<Location> locations = new List<Location>();
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = "SELECT Id, Name, Streetname, Housenumber, Postalcode FROM Location"; // Verwijderd WHERE Id = @locationId
+                SqlCommand command = new SqlCommand(sql, connection);
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        locations.Add(new Location(
+                            reader.GetInt32(0),
+                            reader.GetString(1),
+                            reader.GetString(2),
+                            reader.GetString(3),
+                            reader.GetString(4)
+                        ));
+                    }
+                }
+            }
+
+            return locations;
+        }
+
+        public Location ReadLocation(Location location)
+        {
+            Location newLocation = null;
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = "INSERT INTO Location (Name, Streetname, Housenumber, Postalcode) VALUES (@Name, @Streetname, @Housenumber, @Postalcode); SELECT SCOPE_IDENTITY();";
+                SqlCommand command = new SqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@Name", location.Name);
+                command.Parameters.AddWithValue("@Streetname", location.StreetName);
+                command.Parameters.AddWithValue("@Housenumber", location.HouseNumber);
+                command.Parameters.AddWithValue("@Postalcode", location.PostalCode);
+                command.Parameters.AddWithValue("@locationId", location);
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        newLocation = new Location(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetString(4));
+                    }
+                }
+            }
+
+            return newLocation;
+        }
+
+        public Location CreateLocation(Location location)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                // Zorg ervoor dat de SQL-instructie alle benodigde kolommen bevat.
+                string sql = @"
+                    INSERT INTO Location (Name, StreetName, HouseNumber, PostalCode) 
+                    VALUES (@Name, @StreetName, @HouseNumber, @PostalCode); 
+                    SELECT SCOPE_IDENTITY();";
+
+                SqlCommand command = new SqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@Name", location.Name);
+                command.Parameters.AddWithValue("@StreetName", location.StreetName ?? (object)DBNull.Value); // Voorbeeld voor als StreetName NULL mag zijn.
+                command.Parameters.AddWithValue("@HouseNumber", location.HouseNumber ?? (object)DBNull.Value); // Idem voor HouseNumber.
+                command.Parameters.AddWithValue("@PostalCode", location.PostalCode ?? (object)DBNull.Value); // Idem voor PostalCode.
+
+                int newId = Convert.ToInt32(command.ExecuteScalar());
+                location.Id = newId;
+            }
+
+            return location;
+        }
+        public bool DeleteLocation(int locationId)
+        {
+            int rowsAffected = 0;
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sqlDeleteRelated = "DELETE FROM Person WHERE LocationId = @LocationId";
+                SqlCommand commandDeleteRelated = new SqlCommand(sqlDeleteRelated, connection);
+                commandDeleteRelated.Parameters.AddWithValue("@LocationId", locationId);
+
+                // Verwijder eerst alle gerelateerde personen
+                commandDeleteRelated.ExecuteNonQuery();
+
+                // Probeer daarna de locatie te verwijderen
+                string sqlDeleteLocation = "DELETE FROM Location WHERE Id = @Id";
+                SqlCommand commandDeleteLocation = new SqlCommand(sqlDeleteLocation, connection);
+                commandDeleteLocation.Parameters.AddWithValue("@Id", locationId);
+
+                rowsAffected = commandDeleteLocation.ExecuteNonQuery();
+            }
+
+            return rowsAffected > 0;
         }
 
         /// <summary>
@@ -375,5 +577,21 @@ namespace Zuydfit.DataAccessLayer
             }
         }
 
+        public Location UpdateLocation(Location location)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = "UPDATE Location SET Name = @Name, Streetname = @Streetname, Housenumber = @Housenumber, Postalcode = @Postalcode WHERE Id = @Id";
+                SqlCommand command = new SqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@Id", location.Id);
+                command.Parameters.AddWithValue("@Name", location.Name);
+                command.Parameters.AddWithValue("@Streetname", location.StreetName);
+                command.Parameters.AddWithValue("@Housenumber", location.HouseNumber);
+                command.Parameters.AddWithValue("@Postalcode", location.PostalCode);
+                command.ExecuteNonQuery();
+            }
+            return location;
+        }
     }
 }
