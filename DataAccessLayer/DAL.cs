@@ -179,7 +179,6 @@ namespace Zuydfit.DataAccessLayer
                 }
             }
         }
-
         public Activity UpdateActivity(Activity activity)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -210,53 +209,7 @@ namespace Zuydfit.DataAccessLayer
                 }
             }
         }
-        /// <summary>
-        /// Get a list of persons from the database.
-        /// </summary>
-        /// <returns></returns>
-        public List<Person> GetPerson()
-        {
-            List<Person> persons = new List<Person>();
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-
-                string productQuery = "SELECT * FROM Person";
-
-                using (SqlCommand command = new SqlCommand(productQuery, connection))
-                {
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            int personid = Convert.ToInt32(reader[0]);
-                            string firstname = reader[1].ToString();
-                            string lastname = reader[2].ToString();
-                            string streetname = reader[3].ToString();
-                            string housenumber = reader[4].ToString();
-                            string postalcode = reader[5].ToString();
-                            string type = reader[6].ToString();
-
-                            if (type == "Athlete")
-                            {
-                                int locationid = Convert.ToInt32(reader[7]);
-                                int workoutid = Convert.ToInt32(reader[8]);
-                                Person person = new Athlete(personid, firstname, lastname, streetname, housenumber, postalcode, locationid, workoutid);
-                                persons.Add(person);
-                            }
-                            else if (type == "Coach")
-                            {
-                                Person person = new Coach(personid, firstname, lastname, streetname, housenumber, postalcode);
-                                persons.Add(person);
-                            }
-                        }
-                    }
-                }
-            }
-
-                return persons;
-        }
+        
 
         
         public List<Machine> Machines { get; set; } = new List<Machine>();
@@ -355,8 +308,6 @@ namespace Zuydfit.DataAccessLayer
 
             return rowsAffected > 0;
         }
-
-
 
 
         public List<Location> ReadLocations()
@@ -462,6 +413,55 @@ namespace Zuydfit.DataAccessLayer
         }
 
         /// <summary>
+        /// Get a list of persons from the database.
+        /// </summary>
+        /// <returns></returns>
+        public List<Person> GetPerson()
+        {
+            List<Person> persons = new List<Person>();
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                string productQuery = "SELECT * FROM Person";
+
+                using (SqlCommand command = new SqlCommand(productQuery, connection))
+                {
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int personid = Convert.ToInt32(reader[0]);
+                            string firstname = reader[1].ToString();
+                            string lastname = reader[2].ToString();
+                            string streetname = reader[3].ToString();
+                            string housenumber = reader[4].ToString();
+                            string postalcode = reader[5].ToString();
+                            string type = reader[6].ToString();
+
+                            if (type == "Athlete")
+                            {
+                                int locationid = Convert.ToInt32(reader[7]);
+                                Location location = new Location(locationid,"Zuyd Heerlen","Straatnaam","10","1212ab");
+
+                                Person person = new Athlete(personid, firstname, lastname, streetname, housenumber, postalcode, location);
+                                persons.Add(person);
+                            }
+                            else if (type == "Coach")
+                            {
+                                Person person = new Coach(personid, firstname, lastname, streetname, housenumber, postalcode);
+                                persons.Add(person);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return persons;
+        }
+
+        /// <summary>
         /// Create a person in the database.
         /// </summary>
         public void CreatePerson(Person person)
@@ -469,8 +469,8 @@ namespace Zuydfit.DataAccessLayer
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string query = "INSERT INTO Person (Firstname, Lastname, Streetname, Housenumber, Postalcode, Type, LocationId, WorkoutId) " +
-                    "VALUES (@Firstname, @Lastname, @Streetname, @Housenumber, @Postalcode, @Type, @LocationId, @WorkoutId) SELECT SCOPE_IDENTITY()";
+                string query = "INSERT INTO Person (Firstname, Lastname, Streetname, Housenumber, Postalcode, Type, LocationId) " +
+                    "VALUES (@Firstname, @Lastname, @Streetname, @Housenumber, @Postalcode, @Type, @LocationId) SELECT SCOPE_IDENTITY()";
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Firstname", person.FirstName);
@@ -482,14 +482,12 @@ namespace Zuydfit.DataAccessLayer
                     //indicate in the program whether it is a coach or an athlete
                     if (person is Athlete athlete)
                     {
-                        command.Parameters.AddWithValue("@LocationId", athlete.LocationId);
-                        command.Parameters.AddWithValue("@WorkoutId", athlete.WorkoutId);
+                        command.Parameters.AddWithValue("@LocationId", athlete.Location.Id);
                         command.Parameters.AddWithValue("@Type", "Athlete");
                     }
                     else if (person is Coach)
                     {
                         command.Parameters.AddWithValue("@LocationId", DBNull.Value);
-                        command.Parameters.AddWithValue("@WorkoutId", DBNull.Value);
                         command.Parameters.AddWithValue("@Type", "Coach");
                     }
                     else
@@ -514,7 +512,7 @@ namespace Zuydfit.DataAccessLayer
                 connection.Open();
                 try
                 {
-                    string query = "UPDATE Person SET Firstname = @Firstname, Lastname = @Lastname, Streetname = @Streetname, Housenumber = @Housenumber, Postalcode = @Postalcode, Type = @Type, LocationId = @locationId, WorkoutId = @WorkoutId WHERE Id = @Id";
+                    string query = "UPDATE Person SET Firstname = @Firstname, Lastname = @Lastname, Streetname = @Streetname, Housenumber = @Housenumber, Postalcode = @Postalcode, Type = @Type, LocationId = @locationId WHERE Id = @Id";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@Firstname", person.FirstName);
@@ -524,14 +522,12 @@ namespace Zuydfit.DataAccessLayer
                         command.Parameters.AddWithValue("@Postalcode", person.PostalCode);
                         if (person is Athlete athlete)
                         {
-                            command.Parameters.AddWithValue("@LocationId", athlete.LocationId);
-                            command.Parameters.AddWithValue("@WorkoutId", athlete.WorkoutId);
+                            command.Parameters.AddWithValue("@LocationId", athlete.Location.Id);
                             command.Parameters.AddWithValue("@Type", "Athlete");
                         }
                         else if (person is Coach)
                         {
                             command.Parameters.AddWithValue("@LocationId", DBNull.Value);
-                            command.Parameters.AddWithValue("@WorkoutId", DBNull.Value);
                             command.Parameters.AddWithValue("@Type", "Coach");
                         }
                         else
