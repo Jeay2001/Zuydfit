@@ -10,8 +10,7 @@ namespace Zuydfit
     {
         public List<Workout> Workouts { get; set; } = new List<Workout>(); 
         public Location Location { get; set; } 
-        public int WorkoutId { get; set; }
-        public int LocationId { get; set; }
+      
 
 
         public Athlete(int id, string firstName, string lastName, string streetName, string houseNumber, string postalcode, List<Workout> workouts, Location location)
@@ -20,13 +19,5 @@ namespace Zuydfit
             Workouts = workouts;
             Location = location;
         }
-        public Athlete(int id, string firstName, string lastName, string streetName, string houseNumber, string postalcode, int workoutid, int locationid)
-            : base(id, firstName, lastName, streetName, houseNumber, postalcode)
-        {
-            WorkoutId = workoutid;
-            LocationId = locationid;
-        }
-
-        
     }
 }
