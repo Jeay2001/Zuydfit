@@ -13,7 +13,7 @@ namespace Zuydfit
        
 
 
-        public Athlete(int id, string firstName, string lastName, string streetName, string houseNumber, string postalcode, List<Workout> workouts, Location Location)
+        public Athlete(int id, string firstName, string lastName, string streetName, string houseNumber, string postalcode, List<Workout> workouts, Location location)
             : base(id, firstName, lastName, streetName, houseNumber, postalcode)
         {
             Workouts = workouts;

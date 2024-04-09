@@ -382,7 +382,7 @@ namespace Zuydfit.DataAccessLayer
                     //indicate in the program whether it is a coach or an athlete
                     if (person is Athlete athlete)
                     {
-                        command.Parameters.AddWithValue("@LocationId", athlete.LocationId);
+                        command.Parameters.AddWithValue("@LocationId", athlete.Location.Id);
                         command.Parameters.AddWithValue("@WorkoutId", athlete.WorkoutId);
                         command.Parameters.AddWithValue("@Type", "Athlete");
                     }
@@ -424,8 +424,8 @@ namespace Zuydfit.DataAccessLayer
                         command.Parameters.AddWithValue("@Postalcode", person.PostalCode);
                         if (person is Athlete athlete)
                         {
-                            command.Parameters.AddWithValue("@LocationId", athlete.LocationId);
-                            command.Parameters.AddWithValue("@WorkoutId", athlete.WorkoutId);
+                            command.Parameters.AddWithValue("@LocationId", athlete.Location.Id);
+                            //command.Parameters.AddWithValue("@WorkoutId", athlete.WorkoutId);
                             command.Parameters.AddWithValue("@Type", "Athlete");
                         }
                         else if (person is Coach)
