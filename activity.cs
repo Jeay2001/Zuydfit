@@ -4,7 +4,7 @@ using Zuydfit.DataAccessLayer;
 
 namespace Zuydfit
 {
-    public class Activity
+    public class Activity 
     {
         public int Id { get; set; }
         public string Name { get; set; }

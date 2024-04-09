@@ -4,9 +4,11 @@ using System.Reflection;
 using Zuydfit;
 using Zuydfit.DataAccessLayer;
 
+using System;
+
 namespace Zuydfit
 {
-    internal class Program
+    class Program
     {
         static void Main(string[] args)
         {
@@ -425,6 +427,9 @@ namespace Zuydfit
 
     }
 }
+
+
+
 
 
 

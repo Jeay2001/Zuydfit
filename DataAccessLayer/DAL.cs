@@ -14,11 +14,9 @@ namespace Zuydfit.DataAccessLayer
 {
     public class DAL
     {
-
         private readonly string connectionString = "Data Source=sqlserverjeaysnijders.database.windows.net; Initial Catalog = Zuydfit; User ID = Jeay2001; Password=Snijders2208@";
 
         public List<Workout> Workouts { get; set; } = new List<Workout>();
-
 
         public Workout CreateWorkout(Workout workout)
         {
@@ -38,7 +36,6 @@ namespace Zuydfit.DataAccessLayer
 
         public List<Workout> ReadWorkouts(Athlete athlete)
         {
-
             using SqlConnection connection = new(connectionString);
             connection.Open();
             string productQuery = "select workout.id, workout.date, exercise.Id, exercise.Name, exercise.Type, exercise.duration, exercise.Distance, exercise.MachineId, sets.id, sets.Weight, sets.Amount  from personWorkout inner join workout on workout.id = personWorkout.workoutid inner join ExerciseWorkout on ExerciseWorkout.workoutid = workout.id inner join exercise on exercise.id = exerciseWorkout.ExerciseID inner join exerciseSet on exerciseSet.setId = setid inner join sets on exerciseset.SetId = sets.Id " +
@@ -77,19 +74,14 @@ namespace Zuydfit.DataAccessLayer
 
                     if (reader[7] != DBNull.Value)
                     {
-                        int setId = Convert.ToInt32(reader[7]);
+                        int setsId = Convert.ToInt32(reader[7]);
                         int amount = Convert.ToInt32(reader[8]);
                         int weight = Convert.ToInt32(reader[9]);
-                        Set set = new Set(setId, amount, weight);
+                        Sets set = new Sets(setsId, amount, weight);
 
                         Strength previousStrengthExercise = previousExercise as Strength;
                         previousStrengthExercise.Sets.Add(set);
-
                     }
-
-
-                    //int? machineId = Convert.ToInt32(reader[5]);
-
                 }
                 else if (type.ToLower() == "cardio")
                 {
@@ -102,11 +94,9 @@ namespace Zuydfit.DataAccessLayer
                         previousExercise = cardioExercise;
                     }
                 }
-
             }
             return Workouts;
         }
-
 
         public Workout ReadWorkout(Workout workout)
         {
@@ -525,9 +515,7 @@ namespace Zuydfit.DataAccessLayer
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-
                 string productQuery = "SELECT * FROM Person";
-
                 using (SqlCommand command = new SqlCommand(productQuery, connection))
                 {
                     using (SqlDataReader reader = command.ExecuteReader())
@@ -680,16 +668,92 @@ namespace Zuydfit.DataAccessLayer
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string sql = "UPDATE Location SET Name = @Name, Streetname = @Streetname, Housenumber = @Housenumber, Postalcode = @Postalcode WHERE Id = @Id";
-                SqlCommand command = new SqlCommand(sql, connection);
-                command.Parameters.AddWithValue("@Id", location.Id);
-                command.Parameters.AddWithValue("@Name", location.Name);
-                command.Parameters.AddWithValue("@Streetname", location.StreetName);
-                command.Parameters.AddWithValue("@Housenumber", location.HouseNumber);
-                command.Parameters.AddWithValue("@Postalcode", location.PostalCode);
-                command.ExecuteNonQuery();
+                string query = "DELETE FROM Activity WHERE Id = @Id";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", activity.Id);
+                    command.ExecuteNonQuery();
+                }
             }
-            return location;
+        }
+
+        public Sets CreateSet(Sets sets)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "INSERT INTO [Sets] (Reps, Weight) VALUES (@Reps, @Weight); SELECT SCOPE_IDENTITY();";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Reps", sets.Reps);
+                    command.Parameters.AddWithValue("@Weight", sets.Weight);
+                    int setId = Convert.ToInt32(command.ExecuteScalar());
+
+                    // Update de id van het sets-object
+                    sets.Id = setId;
+
+                    return sets;
+                }
+            }
+        }
+
+        public Sets ReadSet(int id)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "SELECT Id, Reps, Weight FROM [Sets] WHERE Id = @Id";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", id);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            int reps = Convert.ToInt32(reader["Reps"]);
+                            double weight = Convert.ToDouble(reader["Weight"]);
+                            Sets sets = new Sets(id, reps, weight);
+                            return sets;
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                }
+            }
+        }
+
+        public Sets UpdateSet(Sets sets)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "UPDATE [Sets] SET Reps = @Reps, Weight = @Weight WHERE Id = @Id";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Reps", sets.Reps);
+                    command.Parameters.AddWithValue("@Weight", sets.Weight);
+                    command.Parameters.AddWithValue("@Id", sets.Id);
+                    command.ExecuteNonQuery();
+                    return sets;
+                }
+            }
+        }
+
+        public bool DeleteSet(int setsId)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "DELETE FROM [Sets] WHERE Id = @Id";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", setsId);
+                    int rowsAffected = command.ExecuteNonQuery();
+                    return rowsAffected > 0;
+                }
+            }
         }
     }
 }

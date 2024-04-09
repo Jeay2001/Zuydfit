@@ -8,14 +8,14 @@ namespace Zuydfit
 {
     public class Strength : Exercise
     {
-        public List<Set> Sets { get; set; }
+        public List<Sets> Sets { get; set; }
 
         public Strength(int id, string name) : base(id, name)
         {
-            Sets = new List<Set>();
+            Sets = new List<Sets>();
         }
         
-        public Strength(int id, string name, List<Set> sets) : base(id, name)
+        public Strength(int id, string name, List<Sets> sets) : base(id, name)
         {
             Sets = sets;
         }
