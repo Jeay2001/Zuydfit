@@ -622,6 +622,15 @@ namespace Zuydfit.DataAccessLayer
                                 Person person = new Coach(personid, firstname, lastname, streetname, housenumber, postalcode);
                                 persons.Add(person);
                             }
+                            else if (type == "Administrator")
+                            {
+                                Person person = new Administrator(personid, firstname, lastname, streetname, housenumber, postalcode);
+                                persons.Add(person);
+                            }
+                            else
+                            {
+                                throw new ArgumentException("Invalid person type.");
+                            }
                         }
                     }
                 }
@@ -658,6 +667,11 @@ namespace Zuydfit.DataAccessLayer
                     {
                         command.Parameters.AddWithValue("@LocationId", DBNull.Value);
                         command.Parameters.AddWithValue("@Type", "Coach");
+                    }
+                    else if (person is Administrator)
+                    {
+                        command.Parameters.AddWithValue("@LocationId", DBNull.Value);
+                        command.Parameters.AddWithValue("@Type", "Administrator");
                     }
                     else
                     {
@@ -698,6 +712,11 @@ namespace Zuydfit.DataAccessLayer
                         {
                             command.Parameters.AddWithValue("@LocationId", DBNull.Value);
                             command.Parameters.AddWithValue("@Type", "Coach");
+                        }
+                        else if (person is Administrator)
+                        {
+                            command.Parameters.AddWithValue("@LocationId", DBNull.Value);
+                            command.Parameters.AddWithValue("@Type", "Administrator");
                         }
                         else
                         {

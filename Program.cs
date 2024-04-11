@@ -13,6 +13,8 @@ namespace Zuydfit
         {
             Console.WriteLine("Hello, World!");
 
+            //List<Workout> workouts = Workout.ReadWorkouts();
+            //PrintWorkouts(workouts);
 
             Location location = new Location(1, "locatie 1", "straatnaam", "huisnummer", "1837jd", []);
             Athlete athlete = new Athlete(1, "John", "Doe", "Street", "1", "1234", [], location);

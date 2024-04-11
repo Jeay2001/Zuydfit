@@ -10,10 +10,9 @@ namespace Zuydfit
     {
         public List<Location> Locations { get; set; } = new List<Location>();
 
-        public Administrator(int id, string firstName, string lastName, string streetName, string houseNumber, string postalcode, List<Location> locations)
+        public Administrator(int id, string firstName, string lastName, string streetName, string houseNumber, string postalcode)
             : base(id, firstName, lastName, streetName, houseNumber, postalcode)
         {
-            Locations = locations;
         }
     }
 }
