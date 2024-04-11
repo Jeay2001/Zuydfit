@@ -43,6 +43,57 @@ namespace Zuydfit.DataAccessLayer
             return workout;
         }
 
+
+        public Exercise CreateExercise(Workout workout, Exercise exercise)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "insert into exercise (name, type, distance, duration) values (@name, @type, @distance, @duration); SELECT SCOPE_IDENTITY();";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@name", exercise.Name);
+
+                    if (exercise is Strength)
+                    {
+                        Strength strengthExercisestrengthExercise = exercise as Strength;
+                        command.Parameters.AddWithValue("@type", "Strength");
+                        command.Parameters.AddWithValue("@duration", DBNull.Value);
+                        command.Parameters.AddWithValue("@distance", DBNull.Value);
+                        // To do - Sets toevoegen
+                    }
+                    else if (exercise is Cardio)
+                    {
+                        Cardio cardioExercise = exercise as Cardio;
+                        command.Parameters.AddWithValue("@type", "Cardio");
+                        command.Parameters.AddWithValue("@duration", cardioExercise.Duration);
+                        command.Parameters.AddWithValue("@distance", cardioExercise.Distance);
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Invalid exercise type.");
+                    }
+
+                    int exerciseId = Convert.ToInt32(command.ExecuteScalar());
+                    exercise.Id = exerciseId;
+
+
+                    string personWorkoutQuery = "INSERT INTO ExerciseWorkout(exerciseId, workoutId) VALUES(@exerciseId, @workoutId);";
+                    using (SqlCommand personWorkoutCommand = new SqlCommand(personWorkoutQuery, connection))
+                    {
+                        personWorkoutCommand.Parameters.AddWithValue("@exerciseId", exercise.Id);
+                        personWorkoutCommand.Parameters.AddWithValue("@workoutId", workout.Id);
+                        personWorkoutCommand.ExecuteScalar();
+                        Console.WriteLine("inserted into exerciseWorkout");
+
+                    }
+                }
+            }
+            return exercise;
+        }
+
+
+
         public List<Workout> ReadWorkouts(Athlete athlete)
         {
             using SqlConnection connection = new(connectionString);
@@ -247,44 +298,6 @@ namespace Zuydfit.DataAccessLayer
         public Workout UpdateWorkout(Workout workout)
         {
 
-            //Console.WriteLine("Update workout");
-            //using (SqlConnection connection = new SqlConnection(connectionString))
-            //{
-            //    connection.Open();
-
-            //    string editProductQuery = "UPDATE workout SET id = @Id, price = @price, Description = @description, Length = @length, Width = @width, Height = @height, Duration = @duration, Type = @type WHERE Id = @id;";
-            //    using (SqlCommand command = new SqlCommand(editProductQuery, connection))
-            //    {
-            //        command.Parameters.AddWithValue("@id", product.Id);
-            //        command.Parameters.AddWithValue("@name", product.Name);
-            //        command.Parameters.AddWithValue("@price", product.Price);
-            //        command.Parameters.AddWithValue("@description", product.Description);
-            //        command.Parameters.AddWithValue("@productId", product.Id);
-            //        if (product is Item)
-            //        {
-            //            Item item = product as Item;
-            //            command.Parameters.AddWithValue("@type", "Item");
-            //            command.Parameters.AddWithValue("@width", item.Lengte);
-            //            command.Parameters.AddWithValue("@height", item.Breedte);
-            //            command.Parameters.AddWithValue("@length", item.Lengte);
-            //            command.Parameters.AddWithValue("@duration", "");
-            //        }
-            //        else if (product is Service)
-            //        {
-            //            Service service = product as Service;
-            //            command.Parameters.AddWithValue("@type", "Service");
-            //            command.Parameters.AddWithValue("@width", "");
-            //            command.Parameters.AddWithValue("@height", "");
-            //            command.Parameters.AddWithValue("@length", "");
-            //            command.Parameters.AddWithValue("@duration", service.Duration);
-            //        }
-            //        command.ExecuteNonQuery();
-            //        Console.WriteLine("edited product");
-            //        Console.WriteLine(product.Id);
-            //    }
-            //}
-            //Products = RetrieveProducts();
-            //return Products;
             return workout;
         }
 
@@ -321,7 +334,7 @@ namespace Zuydfit.DataAccessLayer
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Name", activity.Name);
-                    command.Parameters.AddWithValue("@Duration", activity.Duration); // Sla de duur op als totaal aantal seconden
+                    command.Parameters.AddWithValue("@Duration", activity.Duration);
                     int activityId = Convert.ToInt32(command.ExecuteScalar());
                     activity.Id = activityId;
                     return activity;
@@ -791,8 +804,6 @@ namespace Zuydfit.DataAccessLayer
                     command.Parameters.AddWithValue("@Reps", sets.Reps);
                     command.Parameters.AddWithValue("@Weight", sets.Weight);
                     int setId = Convert.ToInt32(command.ExecuteScalar());
-
-                    // Update de id van het sets-object
                     sets.Id = setId;
 
                     return sets;

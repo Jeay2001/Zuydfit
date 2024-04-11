@@ -37,16 +37,19 @@ namespace Zuydfit
             //Console.WriteLine(" Test workout");
             //testWorkout = testWorkout.ReadWorkout(testWorkout);
             //PrintWorkout(testWorkout);
-
         }
 
-        public static int DisplayMenuOptions(List<string> options, string title = "")
+        public static int DisplayMenuOptions(List<string> options, string title = "", Workout workout = null)
         {
-            //Console.Clear();
+            Console.Clear();
             if (title != "")
             {
                 Console.WriteLine(title);
                 Console.WriteLine();
+            }
+            if (workout != null)
+            {
+                PrintWorkout(workout);
             }
             for (int i = 0; i < options.Count; i++)
             {
@@ -92,7 +95,7 @@ namespace Zuydfit
 
         public static void AthleteViewWorkouts(Athlete athlete)
         {
-            //Console.Clear();
+            Console.Clear();
             Console.WriteLine("Choose a workout to view/edit:");
             Console.WriteLine("");
             Console.WriteLine("1. Go back");
@@ -127,10 +130,48 @@ namespace Zuydfit
                 "Go back",
                 "Main menu",
             ];
-            int choice = DisplayMenuOptions(options, "Create workout menu");
             Workout workout = new Workout(0, DateTime.Now);
-            workout.CreateWorkout(workout, athlete);
-            Console.WriteLine("test create workout");
+            workout = workout.CreateWorkout(workout, athlete);
+            int choice = DisplayMenuOptions(options, "Create workout menu", workout);
+            //PrintWorkout(workout);  
+            //Console.WriteLine("test create workout");
+
+            if (choice == 1)
+            {
+                AthleteWorkoutAddExercise(workout, athlete);
+            }
+            else if (choice == 2)
+            {
+                AthleteWorkoutRemoveExercise(workout, athlete);
+            }
+            else if (choice == 3)
+            {
+                AthleteWorkoutEditExercise(workout, athlete);
+            }
+            else if (choice == 4)
+            {
+                AthleteViewWorkouts(athlete);
+            }
+            else if (choice == 5)
+            {
+                AthleteMainMenu(athlete);
+            }
+            else
+            {
+                Console.WriteLine("Invalid choice");
+            }
+        }
+        
+        public static void AthleteCreateWorkout(Athlete athlete, Workout workout)
+        {
+            List<string> options = [
+                "Add exercise",
+                "Remove exercise",
+                "Edit exercise",
+                "Go back",
+                "Main menu",
+            ];
+            int choice = DisplayMenuOptions(options, "Create workout menu", workout);
 
             if (choice == 1)
             {
@@ -160,72 +201,135 @@ namespace Zuydfit
 
         public static void AthleteWorkoutAddExercise(Workout workout, Athlete athlete)
         {
-            List<string> options = [
-                "Add exercise",
-                "Remove exercise",
-                "Edit exercise",
-                "Go back",
-                "Main menu",
-            ];
-            int choice = DisplayMenuOptions(options);
+            //List<string> options = new List<string> { "Go back", "Main menu", "Create new exercise" };
 
-            if (choice == 1)
-            {
-                //AthleteWorkoutAddExercise(workout, athlete);
-            }
+            //int choice = DisplayMenuOptions(options, "Choose wich exercise you would like to add.", workout);
+
+            //if (choice == 1)
+            //{
+            //    AthleteCreateWorkout(athlete, workout);
+            //}
             //else if (choice == 2)
-            //{
-            //    AthleteWorkoutRemoveExercise(workout, athlete);
-            //}
-            //else if (choice == 3)
-            //{
-            //    AthleteWorkoutEditExercise(workout, athlete);
-            //}
-            //else if (choice == 4)
-            //{
-            //    AthleteViewWorkouts(athlete);
-            //}
-            //else if (choice == 5)
             //{
             //    AthleteMainMenu(athlete);
             //}
-            else
+            //else if (choice == 3)
+            //{
+            //    AthleteCreateExercise(workout, athlete);
+            //}
+            ////else if (choice == 4)
+            ////{
+            ////    AthleteViewWorkouts(athlete);
+            ////}
+            ////else if (choice == 5)
+            ////{
+            ////    AthleteMainMenu(athlete);
+            ////}
+            //else
+            //{
+            //    Console.WriteLine("Invalid choice");
+            //}
+            Console.Write("Exercise name: ");
+            string exerciseName = Console.ReadLine();
+            Console.Write("Exercise type (strength or cardio): ");
+            string exerciseType = Console.ReadLine();
+            List<Sets> sets = new List<Sets>();
+            if (exerciseType == "strength")
             {
-                Console.WriteLine("Invalid choice");
+                bool addSetsFlag = true;
+                while (addSetsFlag)
+                {
+                    Console.WriteLine("Add set? (y/n)");
+                    string newSetBool = Console.ReadLine();
+                    if (newSetBool == "y")
+                    {
+                        Console.Write("Weight: (in Kg)");
+                        double weight = Convert.ToDouble(Console.ReadLine());
+                        Console.Write("Reps: ");
+                        int reps = Convert.ToInt32(Console.ReadLine());
+                        Sets set = new Sets(0, reps, weight);
+                        Sets newSet = set.CreateSet();
+                        newSet = newSet.CreateSet();
+                        sets.Add(newSet);
+                    }
+                    else
+                    {
+                        addSetsFlag = false;
+                    }
+                }
+
+                Strength newExercise = new Strength(0, exerciseName, sets);
+                newExercise.CreateExercise(workout, newExercise);
+                workout.Exercises.Add(newExercise);
+                AthleteCreateWorkout(athlete, workout);
+            }
+            else if (exerciseType == "cardio")
+            {
+                // To do cardio
             }
         }
 
-        public static void AthleteWorkoutRemoveExercise(Workout workout, Athlete athlete)
+        public static void AthleteCreateExercise(Workout workout, Athlete athlete)
         {
+            Console.Write("Exercise name: ");
+            string exerciseName = Console.ReadLine();
+            Console.Write("Exercise type (strength or cardio): ");
+            string exerciseType = Console.ReadLine();
+            List<Sets> sets = new List<Sets>();
+            if (exerciseType == "strength")
+            {
+                bool addSetsFlag = true;
+                while (addSetsFlag) {
+                    Console.WriteLine("Add set? (y/n)");
+                    string newSetBool = Console.ReadLine();
+                    if (newSetBool == "y")
+                    {
+                        Console.Write("Weight: (in Kg)");
+                        double weight = Convert.ToDouble(Console.ReadLine());
+                        Console.Write("Reps: ");
+                        int reps = Convert.ToInt32(Console.ReadLine());
+                        Sets set = new Sets(0, reps, weight);
+                        Sets newSet = set.CreateSet();
+                        newSet = newSet.CreateSet();
+                        sets.Add(newSet);
+                    }
+                    else
+                    {
+                        addSetsFlag = false;
+                    }
+                }
+                
+                Strength newExercise = new Strength(0, exerciseName, sets);
+                newExercise.CreateExercise(workout, newExercise);
+                workout.Exercises.Add(newExercise);
+                AthleteCreateWorkout(athlete, workout);
+            } else if (exerciseType == "cardio")
+            {
+                // To do cardio
+            }
+        }
+
+         static void AthleteWorkoutRemoveExercise(Workout workout, Athlete athlete)
+         {
             List<string> options = [
-                "Add exercise",
-                "Remove exercise",
-                "Edit exercise",
                 "Go back",
                 "Main menu",
+
             ];
-            int choice = DisplayMenuOptions(options);
+            foreach (Exercise exercise in workout.Exercises)
+            {
+                options.Add(exercise.Name);
+            }
+            int choice = DisplayMenuOptions(options, "Choose wich exercise you'd like to remove");
 
             if (choice == 1)
             {
-                //AthleteWorkoutAddExercise(workout, athlete);
+                AthleteCreateWorkout(athlete, workout);
             }
-            //else if (choice == 2)
-            //{
-            //    AthleteWorkoutRemoveExercise(workout, athlete);
-            //}
-            //else if (choice == 3)
-            //{
-            //    AthleteWorkoutEditExercise(workout, athlete);
-            //}
-            //else if (choice == 4)
-            //{
-            //    AthleteViewWorkouts(athlete);
-            //}
-            //else if (choice == 5)
-            //{
-            //    AthleteMainMenu(athlete);
-            //}
+            if (choice == 2)
+            {
+                AthleteMainMenu(athlete);
+            }
             else
             {
                 Console.WriteLine("Invalid choice");
@@ -271,36 +375,32 @@ namespace Zuydfit
 
         public static void AthleteSingleWorkoutMenu(Workout workout, Athlete athlete)
         {
-            //Console.Clear();
-            Console.WriteLine("1. View workout");
-            Console.WriteLine("2. Edit workout");
-            Console.WriteLine("3. Delete workout");
-            Console.WriteLine("4. Go back");
-            Console.WriteLine("5. Main menu");
+            Console.Clear();
+            Console.WriteLine("");
+            Console.WriteLine("1. Edit workout");
+            Console.WriteLine("2. Delete workout");
+            Console.WriteLine("3. Go back");
+            Console.WriteLine("4. Main menu");
 
             Console.WriteLine("");
             int choice = Convert.ToInt32(Console.ReadLine());
 
             if (choice == 1)
             {
-                AthleteViewWorkout(workout, athlete);
-            }
-            if (choice == 2)
-            {
                 AthleteEditWorkout(workout, athlete);
             }
-            else if (choice == 3)
+            else if (choice == 2)
             {
                 //workout.DeleteWorkout();
                 AthleteViewWorkouts(athlete);
 
             }
-            else if (choice == 4)
+            else if (choice == 3)
             {
                 // Previous menu
                 AthleteViewWorkouts(athlete);
             }
-            else if (choice == 5)
+            else if (choice == 4)
             {
                 // Main menu
                 AthleteMainMenu(athlete);
