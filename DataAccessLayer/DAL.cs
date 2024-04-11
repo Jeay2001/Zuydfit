@@ -775,5 +775,88 @@ namespace Zuydfit.DataAccessLayer
                 }
             }
         }
+        public Feedback CreateFeedback(Feedback feedback)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "INSERT INTO Feedback  FeedbackMessage, Date) VALUES (@FeedbackMessage, @Date); SELECT SCOPE_IDENTITY();";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+
+                    command.Parameters.AddWithValue("@Text", feedback.FeedbackMessage);
+                    command.Parameters.AddWithValue("@Date", feedback.Date);
+                    int feedbackId = Convert.ToInt32(command.ExecuteScalar());
+                    feedback.Id = feedbackId;
+                }
+            }
+            return feedback;
+        }
+
+
+        public Feedback ReadFeedback(int feedbackId)
+        {
+            Feedback feedback = null;
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "SELECT Id, FeedbackMessage, Date FROM Feedback WHERE Id = @Id";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", feedbackId);
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            int id = reader.GetInt32(0);
+                            string message = reader.IsDBNull(1) ? null : reader.GetString(1);
+                            DateTime date = reader.IsDBNull(2) ? DateTime.MinValue : reader.GetDateTime(2);
+
+
+                        }
+                    }
+                }
+            }
+
+            return feedback;
+        }
+
+        public Feedback UpdateFeedback(Feedback feedback)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "UPDATE Feedback SET FeedbackMessage = @FeedbackMessage, Date = @Date WHERE Id = @Id";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@FeedbackMessage", feedback.FeedbackMessage);
+                    command.Parameters.AddWithValue("@Date", feedback.Date);
+                    command.Parameters.AddWithValue("@Id", feedback.Id);
+
+                    command.ExecuteNonQuery();
+                }
+            }
+            return feedback;
+        }
+
+
+        public bool DeleteFeedback(int feedbackId)
+        {
+            int rowsAffected = 0;
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "DELETE FROM Feedback WHERE Id = @Id";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", feedbackId);
+                    rowsAffected = command.ExecuteNonQuery();
+                }
+            }
+            // Retourneer true als er rijen zijn beïnvloed, wat aangeeft dat de verwijdering is geslaagd.
+            return rowsAffected > 0;
+        }
     }
 }
