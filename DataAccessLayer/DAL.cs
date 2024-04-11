@@ -11,7 +11,7 @@ using Zuydfit;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Zuydfit.DataAccessLayer
-{
+{ 
     public class DAL
     {
         private readonly string connectionString = "Data Source=sqlserverjeaysnijders.database.windows.net; Initial Catalog = Zuydfit; User ID = Jeay2001; Password=Snijders2208@";
@@ -38,12 +38,16 @@ namespace Zuydfit.DataAccessLayer
         {
             using SqlConnection connection = new(connectionString);
             connection.Open();
-            string productQuery = "select workout.id, workout.date, exercise.Id, exercise.Name, exercise.Type, exercise.duration, exercise.Distance, exercise.MachineId, sets.id, sets.Weight, sets.Amount  from personWorkout inner join workout on workout.id = personWorkout.workoutid inner join ExerciseWorkout on ExerciseWorkout.workoutid = workout.id inner join exercise on exercise.id = exerciseWorkout.ExerciseID inner join exerciseSet on exerciseSet.setId = setid inner join sets on exerciseset.SetId = sets.Id " +
+            string productQuery = "select workout.id, workout.date, exercise.Id, exercise.Name, exercise.Type, exercise.duration, exercise.Distance, exercise.MachineId, sets.id, sets.Weight, sets.Reps  from personWorkout inner join workout on workout.id = personWorkout.workoutid inner join ExerciseWorkout on ExerciseWorkout.workoutid = workout.id inner join exercise on exercise.id = exerciseWorkout.ExerciseID inner join exerciseSet on exerciseSet.setId = setid inner join sets on exerciseset.SetId = sets.Id " +
                 "where personWorkout.personid = @id";
             using SqlCommand command = new(productQuery, connection);
-            using SqlDataReader reader = command.ExecuteReader();
             command.Parameters.AddWithValue("@Id", athlete.Id);
-            command.ExecuteNonQuery();
+            using SqlDataReader reader = command.ExecuteReader();
+            //command.ExecuteNonQuery();
+            //using SqlDataReader reader = command.ExecuteReader();
+            //command.Parameters.AddWithValue("@Id", athlete.Id);
+            //command.ExecuteNonQuery();
+
 
 
             Workout previousWorkout = new Workout(0, new DateTime());
@@ -98,11 +102,86 @@ namespace Zuydfit.DataAccessLayer
             return Workouts;
         }
 
+
         public Workout ReadWorkout(Workout workout)
         {
-            // To do - read workout from DataBase
-            return workout;
+
+            using SqlConnection connection = new(connectionString);
+            connection.Open();
+            string productQuery = "select workout.id, workout.date, exercise.Id, exercise.Name, exercise.Type, exercise.duration, exercise.Distance, exercise.MachineId, sets.id, sets.Weight, sets.Reps  from personWorkout inner join workout on workout.id = personWorkout.workoutid inner join ExerciseWorkout on ExerciseWorkout.workoutid = workout.id inner join exercise on exercise.id = exerciseWorkout.ExerciseID inner join exerciseSet on exerciseSet.setId = setid inner join sets on exerciseset.SetId = sets.Id " +
+                "where personWorkout.workoutId = @id";
+            using SqlCommand command = new(productQuery, connection);
+            command.Parameters.AddWithValue("@Id", workout.Id);
+            using SqlDataReader reader = command.ExecuteReader();
+
+            Workout newWorkout = null;
+
+            int previousExerciseId = 0;
+
+            int index = 0;
+            while (reader.Read())
+            {
+                Console.WriteLine("reader line");
+                if (index == 0)
+                {
+                    int id = Convert.ToInt32(reader[0]);
+                    DateTime date = Convert.ToDateTime(reader[1]);
+                    newWorkout = new Workout(id, date);
+                    index++;
+                }
+                    
+                int exerciseId = Convert.ToInt32(reader[2]);
+                string name = reader[3].ToString();
+                string type = reader[4].ToString();
+
+                Console.WriteLine(type);
+
+                if (type.ToLower() == "strength")
+                {
+                    if (previousExerciseId != exerciseId)
+                    {
+                        Strength strengthExercise = new Strength(exerciseId, name, []);
+                        newWorkout.Exercises.Add(strengthExercise);
+                    }
+
+                    if (reader[8] != DBNull.Value)
+                    {
+                        int setsId = Convert.ToInt32(reader[8]);
+                        int amount = Convert.ToInt32(reader[9]);
+                        int weight = Convert.ToInt32(reader[10]);
+                        Sets set = new Sets(setsId, amount, weight);
+
+
+                        // Find current exercise and add set
+                        Strength currentExercise = (Strength)newWorkout.Exercises.Find(exercise => exercise.Id == exerciseId);
+
+                        if (currentExercise != null)
+                        {
+                            // Remove current exercise from workout and add it again with the new set
+                            currentExercise.Sets.Add(set);
+                            newWorkout.Exercises.Remove(currentExercise);
+                            newWorkout.Exercises.Add(currentExercise);
+                        }
+                    }
+                }
+                else if (type.ToLower() == "cardio")
+                {
+                    string duration = Convert.ToString(reader[5]);
+                    string distance = Convert.ToString(reader[6]);
+                    if (previousExerciseId != exerciseId)
+                    {
+                        Cardio cardioExercise = new Cardio(exerciseId, name, duration, distance);
+                        newWorkout.Exercises.Add(cardioExercise);
+                        //previousExercise = cardioExercise;
+                    }
+                }
+                previousExerciseId = exerciseId;
+
+            }
+            return newWorkout;
         }
+
+
 
 
         public List<Exercise> ReadExerciseListFromAthlete(Athlete athlete)
@@ -111,7 +190,7 @@ namespace Zuydfit.DataAccessLayer
 
             using SqlConnection connection = new(connectionString);
             connection.Open();
-            string productQuery = "select exercise.Id, exercise.Name, exercise.Type, exercise.duration, exercise.Distance, exercise.MachineId, sets.id, sets.Weight, sets.Amount  from personWorkout\r\ninner join workout on workout.id = personWorkout.workoutid\r\ninner join ExerciseWorkout on ExerciseWorkout.workoutid = workout.id\r\ninner join exercise on exercise.id = exerciseWorkout.ExerciseID\r\ninner join exerciseSet on exerciseSet.setId = setid\r\ninner join sets on exerciseset.SetId = sets.Id " +
+            string productQuery = "select exercise.Id, exercise.Name, exercise.Type, exercise.duration, exercise.Distance, exercise.MachineId, sets.id, sets.Weight, sets.Reps  from personWorkout\r\ninner join workout on workout.id = personWorkout.workoutid\r\ninner join ExerciseWorkout on ExerciseWorkout.workoutid = workout.id\r\ninner join exercise on exercise.id = exerciseWorkout.ExerciseID\r\ninner join exerciseSet on exerciseSet.setId = setid\r\ninner join sets on exerciseset.SetId = sets.Id " +
                 "where personWorkout.personid = @id";
             using SqlCommand command = new(productQuery, connection);
             command.Parameters.AddWithValue("@Id", athlete.Id);
