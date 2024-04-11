@@ -31,7 +31,8 @@ namespace Zuydfit
             //}
 
             Location location = new Location(1, "locatie 1", "straatnaam", "huisnummer", "1837jd", []);
-            Athlete athlete = new Athlete(1, "John", "Doe", "Street", "1", "1234", [], location);
+            List<Feedback> feedbacks = new List<Feedback>();
+            Athlete athlete = new Athlete(1, "John", "Doe", "Street", "1", "1234", [], location, feedbacks);
 
 
 

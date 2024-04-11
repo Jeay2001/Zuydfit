@@ -534,18 +534,21 @@ namespace Zuydfit.DataAccessLayer
                             {
                                 int locationid = Convert.ToInt32(reader[7]);
                                 Location location = new Location(locationid,"Zuyd Heerlen","Straatnaam","10","1212ab");
+                                List<Feedback> feedbacks = new List<Feedback>();
 
-                                Person person = new Athlete(personid, firstname, lastname, streetname, housenumber, postalcode, location);
+                                Person person = new Athlete(personid, firstname, lastname, streetname, housenumber, postalcode, location, feedbacks);
                                 persons.Add(person);
                             }
                             else if (type == "Coach")
                             {
-                                Person person = new Coach(personid, firstname, lastname, streetname, housenumber, postalcode);
+                                List<Feedback> feedbacks = new List<Feedback>();
+                                Person person = new Coach(personid, firstname, lastname, streetname, housenumber, postalcode, feedbacks);
                                 persons.Add(person);
                             }
                             else if (type == "Administrator")
                             {
-                                Person person = new Administrator(personid, firstname, lastname, streetname, housenumber, postalcode);
+                                List<Location> locations = new List<Location>();
+                                Person person = new Administrator(personid, firstname, lastname, streetname, housenumber, postalcode, locations);
                                 persons.Add(person);
                             }
                             else
@@ -568,8 +571,8 @@ namespace Zuydfit.DataAccessLayer
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string query = "INSERT INTO Person (Firstname, Lastname, Streetname, Housenumber, Postalcode, Type, LocationId) " +
-                    "VALUES (@Firstname, @Lastname, @Streetname, @Housenumber, @Postalcode, @Type, @LocationId) SELECT SCOPE_IDENTITY()";
+                string query = "INSERT INTO Person (Firstname, Lastname, Streetname, Housenumber, Postalcode, Type, LocationId, FeedbackId) " +
+                    "VALUES (@Firstname, @Lastname, @Streetname, @Housenumber, @Postalcode, @Type, @LocationId, @FeedbackId) SELECT SCOPE_IDENTITY()";
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Firstname", person.FirstName);
@@ -582,16 +585,19 @@ namespace Zuydfit.DataAccessLayer
                     if (person is Athlete athlete)
                     {
                         command.Parameters.AddWithValue("@LocationId", athlete.Location.Id);
+                        command.Parameters.AddWithValue("FeedbackId", athlete.Feedback.Id);
                         command.Parameters.AddWithValue("@Type", "Athlete");
                     }
-                    else if (person is Coach)
+                    else if (person is Coach coach)
                     {
                         command.Parameters.AddWithValue("@LocationId", DBNull.Value);
+                        command.Parameters.AddWithValue("FeedbackId", coach.Feedback.Id);
                         command.Parameters.AddWithValue("@Type", "Coach");
                     }
                     else if (person is Administrator)
                     {
                         command.Parameters.AddWithValue("@LocationId", DBNull.Value);
+                        command.Parameters.AddWithValue("@FeedbackId", DBNull.Value);
                         command.Parameters.AddWithValue("@Type", "Administrator");
                     }
                     else
@@ -616,7 +622,8 @@ namespace Zuydfit.DataAccessLayer
                 connection.Open();
                 try
                 {
-                    string query = "UPDATE Person SET Firstname = @Firstname, Lastname = @Lastname, Streetname = @Streetname, Housenumber = @Housenumber, Postalcode = @Postalcode, Type = @Type, LocationId = @locationId WHERE Id = @Id";
+                    string query = "UPDATE Person SET Firstname = @Firstname, Lastname = @Lastname, Streetname = @Streetname, " +
+                        "Housenumber = @Housenumber, Postalcode = @Postalcode, Type = @Type, LocationId = @locationId, FeedbackId = @Feedback WHERE Id = @Id";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@Firstname", person.FirstName);
@@ -627,16 +634,19 @@ namespace Zuydfit.DataAccessLayer
                         if (person is Athlete athlete)
                         {
                             command.Parameters.AddWithValue("@LocationId", athlete.Location.Id);
+                            command.Parameters.AddWithValue("FeedbackId", athlete.Feedback.Id);
                             command.Parameters.AddWithValue("@Type", "Athlete");
                         }
-                        else if (person is Coach)
+                        else if (person is Coach coach)
                         {
                             command.Parameters.AddWithValue("@LocationId", DBNull.Value);
+                            command.Parameters.AddWithValue("FeedbackId", coach.Feedback.Id);
                             command.Parameters.AddWithValue("@Type", "Coach");
                         }
                         else if (person is Administrator)
                         {
                             command.Parameters.AddWithValue("@LocationId", DBNull.Value);
+                            command.Parameters.AddWithValue("FeedbackId", DBNull.Value);
                             command.Parameters.AddWithValue("@Type", "Administrator");
                         }
                         else
@@ -658,7 +668,7 @@ namespace Zuydfit.DataAccessLayer
         /// <summary>
         /// Deletes a person from the database.
         /// </summary>
-        public void DeletePerson(Person person)
+        public bool TryDeletePerson(Person person)
         {
             try
             {
@@ -667,20 +677,24 @@ namespace Zuydfit.DataAccessLayer
                     connection.Open();
 
                     // Delete associated orderlines first
-                    string DeletePersonquery = "DELETE FROM Person WHERE Id = @id";
-                    using (SqlCommand deletepersoncommand = new SqlCommand(DeletePersonquery, connection))
+                    string deletePersonQuery = "DELETE FROM Person WHERE Id = @id";
+                    using (SqlCommand deletePersonCommand = new SqlCommand(deletePersonQuery, connection))
                     {
-                        deletepersoncommand.Parameters.AddWithValue("@id", person.Id);
-                        deletepersoncommand.ExecuteNonQuery();
+                        deletePersonCommand.Parameters.AddWithValue("@id", person.Id);
+                        int rowsAffected = deletePersonCommand.ExecuteNonQuery();
+
+                        // Check if any rows were affected (person was deleted)
+                        return rowsAffected > 0;
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("An error occurred while deleting the product: " + ex.Message);
-                throw;
+                Console.WriteLine("An error occurred while deleting the person: " + ex.Message);
+                return false; // Return false to indicate deletion failure
             }
         }
+
 
         public Location UpdateLocation(Location location)
         {
