@@ -38,12 +38,12 @@ namespace Zuydfit.DataAccessLayer
         {
             using SqlConnection connection = new(connectionString);
             connection.Open();
-            string productQuery = "select workout.id, workout.date, exercise.Id, exercise.Name, exercise.Type, exercise.duration, exercise.Distance, exercise.MachineId, sets.id, sets.Weight, sets.Amount  from personWorkout inner join workout on workout.id = personWorkout.workoutid inner join ExerciseWorkout on ExerciseWorkout.workoutid = workout.id inner join exercise on exercise.id = exerciseWorkout.ExerciseID inner join exerciseSet on exerciseSet.setId = setid inner join sets on exerciseset.SetId = sets.Id " +
+            string productQuery = "select workout.id, workout.date, exercise.Id, exercise.Name, exercise.Type, exercise.duration, exercise.Distance, exercise.MachineId, sets.id, sets.Weight, sets.Reps  from personWorkout inner join workout on workout.id = personWorkout.workoutid inner join ExerciseWorkout on ExerciseWorkout.workoutid = workout.id inner join exercise on exercise.id = exerciseWorkout.ExerciseID inner join exerciseSet on exerciseSet.setId = setid inner join sets on exerciseset.SetId = sets.Id " +
                 "where personWorkout.personid = @id";
             using SqlCommand command = new(productQuery, connection);
-            using SqlDataReader reader = command.ExecuteReader();
             command.Parameters.AddWithValue("@Id", athlete.Id);
-            command.ExecuteNonQuery();
+            using SqlDataReader reader = command.ExecuteReader();
+            //command.ExecuteNonQuery();
 
 
             Workout previousWorkout = new Workout(0, new DateTime());
@@ -111,7 +111,7 @@ namespace Zuydfit.DataAccessLayer
 
             using SqlConnection connection = new(connectionString);
             connection.Open();
-            string productQuery = "select exercise.Id, exercise.Name, exercise.Type, exercise.duration, exercise.Distance, exercise.MachineId, sets.id, sets.Weight, sets.Amount  from personWorkout\r\ninner join workout on workout.id = personWorkout.workoutid\r\ninner join ExerciseWorkout on ExerciseWorkout.workoutid = workout.id\r\ninner join exercise on exercise.id = exerciseWorkout.ExerciseID\r\ninner join exerciseSet on exerciseSet.setId = setid\r\ninner join sets on exerciseset.SetId = sets.Id " +
+            string productQuery = "select exercise.Id, exercise.Name, exercise.Type, exercise.duration, exercise.Distance, exercise.MachineId, sets.id, sets.Weight, sets.Reps  from personWorkout\r\ninner join workout on workout.id = personWorkout.workoutid\r\ninner join ExerciseWorkout on ExerciseWorkout.workoutid = workout.id\r\ninner join exercise on exercise.id = exerciseWorkout.ExerciseID\r\ninner join exerciseSet on exerciseSet.setId = setid\r\ninner join sets on exerciseset.SetId = sets.Id " +
                 "where personWorkout.personid = @id";
             using SqlCommand command = new(productQuery, connection);
             command.Parameters.AddWithValue("@Id", athlete.Id);
