@@ -8,13 +8,12 @@ namespace Zuydfit
 {
     internal class Administrator : Person
     {
+        public List<Location> Locations { get; set; } = new List<Location>();
 
-        public Administrator(int id, string firstName, string lastName, string streetName, string houseNumber, string postalcode)
+        public Administrator(int id, string firstName, string lastName, string streetName, string houseNumber, string postalcode, List<Location> locations)
             : base(id, firstName, lastName, streetName, houseNumber, postalcode)
         {
-
+            Locations = locations;
         }
-
-
     }
 }
