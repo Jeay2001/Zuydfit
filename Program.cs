@@ -72,7 +72,7 @@ namespace Zuydfit
                     if (strength.Sets.Count > 0)
                     {
                         Console.WriteLine("  Sets:");
-                        foreach (Set set in strength.Sets)
+                        foreach (Sets set in strength.Sets)
                         {
                             Console.WriteLine($"    - Weight: {set.Weight} Reps: {set.Reps}");
                         }

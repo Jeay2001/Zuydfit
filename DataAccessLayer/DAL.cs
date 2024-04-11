@@ -141,7 +141,7 @@ namespace Zuydfit.DataAccessLayer
                         int setId = Convert.ToInt32(reader[6]);
                         int weight = Convert.ToInt32(reader[7]);
                         int amount = Convert.ToInt32(reader[8]);
-                        Set set = new Set(setId, amount, weight);
+                        Sets set = new Sets(setId, amount, weight);
                         Strength previousStrengthExercise = previousExercise as Strength;
                         previousStrengthExercise.Sets.Add(set);
                     }
@@ -671,9 +671,10 @@ namespace Zuydfit.DataAccessLayer
                 string query = "DELETE FROM Activity WHERE Id = @Id";
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@Id", activity.Id);
+                    command.Parameters.AddWithValue("@Id", location.Id);
                     command.ExecuteNonQuery();
                 }
+                return location;
             }
         }
 
