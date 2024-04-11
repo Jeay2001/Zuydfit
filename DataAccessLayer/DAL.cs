@@ -8,8 +8,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Zuydfit;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
 namespace Zuydfit.DataAccessLayer
 { 
     public class DAL
@@ -18,8 +16,9 @@ namespace Zuydfit.DataAccessLayer
 
         public List<Workout> Workouts { get; set; } = new List<Workout>();
 
-        public Workout CreateWorkout(Workout workout)
+        public Workout CreateWorkout(Workout workout, Athlete athlete)
         {
+            Console.WriteLine("Create workout in DAL");
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
@@ -29,6 +28,16 @@ namespace Zuydfit.DataAccessLayer
                     command.Parameters.AddWithValue("@Date", workout.Date);
                     int workoutId = Convert.ToInt32(command.ExecuteScalar());
                     workout.Id = workoutId;
+
+                    string personWorkoutQuery = "INSERT INTO PersonWorkout(personId, workoutId) VALUES(@personId, @workoutId);";
+                    using (SqlCommand personWorkoutCommand = new SqlCommand(personWorkoutQuery, connection))
+                    {
+                        personWorkoutCommand.Parameters.AddWithValue("@personId", athlete.Id);
+                        personWorkoutCommand.Parameters.AddWithValue("@workoutId", workout.Id);
+                        personWorkoutCommand.ExecuteScalar();
+                        Console.WriteLine("inserted into personworkout");
+
+                    }
                 }
             }
             return workout;
@@ -43,11 +52,6 @@ namespace Zuydfit.DataAccessLayer
             using SqlCommand command = new(productQuery, connection);
             command.Parameters.AddWithValue("@Id", athlete.Id);
             using SqlDataReader reader = command.ExecuteReader();
-            //command.ExecuteNonQuery();
-            //using SqlDataReader reader = command.ExecuteReader();
-            //command.Parameters.AddWithValue("@Id", athlete.Id);
-            //command.ExecuteNonQuery();
-
 
 
             Workout previousWorkout = new Workout(0, new DateTime());
@@ -613,7 +617,6 @@ namespace Zuydfit.DataAccessLayer
                             {
                                 int locationid = Convert.ToInt32(reader[7]);
                                 Location location = new Location(locationid,"Zuyd Heerlen","Straatnaam","10","1212ab");
-
                                 Person person = new Athlete(personid, firstname, lastname, streetname, housenumber, postalcode, location);
                                 persons.Add(person);
                             }
@@ -624,7 +627,8 @@ namespace Zuydfit.DataAccessLayer
                             }
                             else if (type == "Administrator")
                             {
-                                Person person = new Administrator(personid, firstname, lastname, streetname, housenumber, postalcode);
+                                // To do locations
+                                Person person = new Administrator(personid, firstname, lastname, streetname, housenumber, postalcode, []);
                                 persons.Add(person);
                             }
                             else
