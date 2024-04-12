@@ -32,8 +32,6 @@ namespace Zuydfit
         {
             DAL dal = new DAL();
             Sets createdSet = dal.CreateSet(this);
-            // Je kunt de id van het gemaakte set-object hier niet instellen
-            // omdat het pas wordt gegenereerd nadat het is toegevoegd aan de database
             return createdSet;
         }
 

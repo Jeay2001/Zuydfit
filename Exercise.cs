@@ -24,5 +24,13 @@ namespace Zuydfit
             List<Exercise> exercises = dal.ReadExerciseListFromAthlete(athlete);
             return exercises;
         }
+
+        public Exercise CreateExercise(Workout workout, Exercise exercise)
+        {
+            DAL dal = new DAL();
+            Exercise createdExercise = dal.CreateExercise(workout, exercise);
+            return createdExercise;
+        }
+
     }
 }
