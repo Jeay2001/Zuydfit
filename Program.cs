@@ -13,7 +13,7 @@ namespace Zuydfit
         {
             Console.WriteLine("Welkom bij Zuydfit!");
 
-           
+
 
 
             //List<Workout> workouts = Workout.ReadWorkouts();
@@ -22,7 +22,7 @@ namespace Zuydfit
             Location location = new Location(1, "locatie 1", "straatnaam", "huisnummer", "1837jd", []);
             List<Feedback> feedbacks = new List<Feedback>();
             Athlete athlete = new Athlete(1, "John", "Doe", "Street", "1", "1234", [], location, feedbacks);
-            Administrator administrator = new Administrator(1, "karel", "kerel", "hebikniet", "66", "9999", [], []);
+            Administrator administrator = new Administrator(1, "karel", "kerel", "hebikniet", "66", "9999", []);
 
 
             List<Workout> workouts = Workout.ReadWorkouts(athlete);
@@ -36,7 +36,7 @@ namespace Zuydfit
                 AdministratorMenu(administrator);
                 flag = false;
             }
-
+        }
 
         static void AdministratorMenu(Administrator administrator)
         {
@@ -72,15 +72,12 @@ namespace Zuydfit
             Console.Clear();
             Console.WriteLine("Coaches:");
 
-            if (coaches.Count == 0)
+            List<Person> persons = Person.GetPersons();
+            foreach (Person person in persons)
             {
-                Console.WriteLine("No coaches available.");
-            }
-            else
-            {
-                for (int i = 0; i < coaches.Count; i++)
+                if (person is Coach)
                 {
-                    Console.WriteLine($"{i + 1}. {coaches[i].FirstName}");
+                    Console.WriteLine($"Coach: {person.Id} - {person.FirstName} {person.LastName}");
                 }
             }
 
@@ -145,9 +142,16 @@ public static void AddCoach(Administrator administrator)
             // Laat eerst de lijst met coaches zien om te kiezen welke coach te verwijderen
             Console.WriteLine("Select the coach to delete:");
 
-            List<Coach> coaches = administrator.Coaches;
+            List<Person> persons = Person.GetPersons();
+            foreach (Person person in persons)
+            {
+                if (person is Coach)
+                {
+                    Console.WriteLine($"Coach: {person.Id} - {person.FirstName} {person.LastName}");
+                }
+            }
 
-            if (coaches.Count == 0)
+            if (persons.Count == 0)
             {
                 Console.WriteLine("No coaches available to delete.");
                 Console.WriteLine("Press any key to go back.");
@@ -155,23 +159,11 @@ public static void AddCoach(Administrator administrator)
                 return;
             }
 
-            for (int i = 0; i < coaches.Count; i++)
-            {
-                Console.WriteLine($"{i + 1}. {coaches[i].FirstName}");
-            }
-
             // Vraag de gebruiker om de keuze van coach
-            Console.Write("Enter the number of the coach to delete: ");
-            int choice;
-            while (!int.TryParse(Console.ReadLine(), out choice) || choice < 1 || choice > coaches.Count)
-            {
-                Console.WriteLine("Invalid input. Please enter a valid number.");
-                Console.Write("Enter the number of the coach to delete: ");
-            }
-
-            // Verwijder de geselecteerde coach
-            Coach coachToDelete = coaches[choice - 1];
-            administrator.Coaches.Remove(coachToDelete);
+            Console.WriteLine("Enter the number of the coach to delete: ");
+            int id = Convert.ToInt32(Console.ReadLine());
+            Person personToUpdate = persons.Find(p => p.Id == id);
+            personToUpdate.DeletePerson();
 
             Console.WriteLine("Coach deleted successfully.");
             Console.WriteLine("Press any key to continue.");
