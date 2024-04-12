@@ -43,7 +43,8 @@ namespace Zuydfit
             List<string> options = new List<string> {
         "View coaches",
         "Add coach",
-        "Delete coach"
+        "Delete coach",
+        "Update coach"
     };
             int choice = DisplayMenuOptions(options, "Administrator Menu");
 
@@ -57,6 +58,9 @@ namespace Zuydfit
                     break;
                 case 3:
                     DeleteCoach(administrator);
+                    break;
+                case 4:
+                    UpdateCoach(administrator);
                     break;
                 default:
                     Console.WriteLine("Invalid choice");
@@ -169,6 +173,98 @@ public static void AddCoach(Administrator administrator)
             Console.WriteLine("Press any key to continue.");
             Console.ReadKey();
         }
+
+        public static void UpdateCoach(Administrator administrator)
+        {
+            static string InputValue(string prompt)
+            {
+                Console.WriteLine(prompt);
+                string input = Console.ReadLine();
+                while (string.IsNullOrEmpty(input))
+                {
+                    Console.WriteLine(prompt + " cannot be empty. Please enter a value:");
+                    input = Console.ReadLine();
+                }
+                return input;
+            }
+            List<Person> persons = Person.GetPersons();
+            foreach (Person person in persons)
+            {
+                if (person is Coach)
+                {
+                    Console.WriteLine($"Coach: {person.Id} - {person.FirstName} {person.LastName}");
+                }
+            }
+            Console.WriteLine("Choose a person to Update:");
+            int id = Convert.ToInt32(Console.ReadLine());
+            Person personToUpdate = persons.Find(p => p.Id == id);
+
+            if (personToUpdate != null)
+            {
+                Console.Clear();
+                Console.WriteLine("Choose what you want to update:");
+                Console.WriteLine("1. First Name");
+                Console.WriteLine("2. Last Name");
+                Console.WriteLine("3. Street Name");
+                Console.WriteLine("4. House Number");
+                Console.WriteLine("5. Postal Code");
+
+                if (personToUpdate is Coach)
+                {
+                    Console.WriteLine("6. Feedback ID");
+                }
+
+                Console.WriteLine("Enter your choice:");
+                string updateChoice = Console.ReadLine();
+                switch (updateChoice)
+                {
+                    case "1":
+                        personToUpdate.FirstName = InputValue("First Name");
+                        break;
+                    case "2":
+                        personToUpdate.LastName = InputValue("Last Name");
+                        break;
+                    case "3":
+                        personToUpdate.StreetName = InputValue("Street Name");
+                        break;
+                    case "4":
+                        personToUpdate.HouseNumber = InputValue("House Number");
+                        break;
+                    case "5":
+                        personToUpdate.PostalCode = InputValue("Postal Code");
+                        break;
+                    case "6":
+                        if (personToUpdate is Athlete athleteToUpdate)
+                        {
+
+                            int locationId = Convert.ToInt32(InputValue("Location ID"));
+                            athleteToUpdate.Location.Id = locationId;
+                        }
+                        else if (personToUpdate is Coach coachToUpdate)
+                        {
+                            int feedbackId = Convert.ToInt32(InputValue("Feedback ID"));
+                            coachToUpdate.Feedback.Id = feedbackId;
+                        }
+                        break;
+                    case "7":
+                        if (personToUpdate is Athlete athleteToUpdateFeedback)
+                        {
+                            int feedbackId = Convert.ToInt32(InputValue("Feedback ID"));
+                            athleteToUpdateFeedback.Feedback.Id = feedbackId;
+                        }
+                        break;
+                    default:
+                        Console.WriteLine("Invalid choice. Please try again.");
+                        break;
+                }
+                personToUpdate.UpdatePerson();
+                Console.WriteLine("Person updated successfully!");
+                Console.WriteLine("==============");
+
+            }
+
+        }
+
 
         public static int DisplayMenuOptions(List<string> options, string title = "", Workout workout = null)
         {
