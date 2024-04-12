@@ -764,7 +764,7 @@ namespace Zuydfit.DataAccessLayer
         /// <summary>
         /// Deletes a person from the database.
         /// </summary>
-        public bool TryDeletePerson(Person person)
+        public bool DeletePerson(Person person)
         {
             try
             {
