@@ -630,18 +630,21 @@ namespace Zuydfit.DataAccessLayer
                             {
                                 int locationid = Convert.ToInt32(reader[7]);
                                 Location location = new Location(locationid,"Zuyd Heerlen","Straatnaam","10","1212ab");
-                                Person person = new Athlete(personid, firstname, lastname, streetname, housenumber, postalcode, location);
+                                List<Feedback> feedbacks = new List<Feedback>();
+
+                                Person person = new Athlete(personid, firstname, lastname, streetname, housenumber, postalcode, location, feedbacks);
                                 persons.Add(person);
                             }
                             else if (type == "Coach")
                             {
-                                Person person = new Coach(personid, firstname, lastname, streetname, housenumber, postalcode);
+                                List<Feedback> feedbacks = new List<Feedback>();
+                                Person person = new Coach(personid, firstname, lastname, streetname, housenumber, postalcode, feedbacks);
                                 persons.Add(person);
                             }
                             else if (type == "Administrator")
                             {
-                                // To do locations
-                                Person person = new Administrator(personid, firstname, lastname, streetname, housenumber, postalcode, []);
+                                List<Location> locations = new List<Location>();
+                                Person person = new Administrator(personid, firstname, lastname, streetname, housenumber, postalcode, locations);
                                 persons.Add(person);
                             }
                             else
@@ -664,8 +667,8 @@ namespace Zuydfit.DataAccessLayer
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string query = "INSERT INTO Person (Firstname, Lastname, Streetname, Housenumber, Postalcode, Type, LocationId) " +
-                    "VALUES (@Firstname, @Lastname, @Streetname, @Housenumber, @Postalcode, @Type, @LocationId) SELECT SCOPE_IDENTITY()";
+                string query = "INSERT INTO Person (Firstname, Lastname, Streetname, Housenumber, Postalcode, Type, LocationId, FeedbackId) " +
+                    "VALUES (@Firstname, @Lastname, @Streetname, @Housenumber, @Postalcode, @Type, @LocationId, @FeedbackId) SELECT SCOPE_IDENTITY()";
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Firstname", person.FirstName);
@@ -678,16 +681,19 @@ namespace Zuydfit.DataAccessLayer
                     if (person is Athlete athlete)
                     {
                         command.Parameters.AddWithValue("@LocationId", athlete.Location.Id);
+                        command.Parameters.AddWithValue("FeedbackId", athlete.Feedback.Id);
                         command.Parameters.AddWithValue("@Type", "Athlete");
                     }
-                    else if (person is Coach)
+                    else if (person is Coach coach)
                     {
                         command.Parameters.AddWithValue("@LocationId", DBNull.Value);
+                        command.Parameters.AddWithValue("FeedbackId", coach.Feedback.Id);
                         command.Parameters.AddWithValue("@Type", "Coach");
                     }
                     else if (person is Administrator)
                     {
                         command.Parameters.AddWithValue("@LocationId", DBNull.Value);
+                        command.Parameters.AddWithValue("@FeedbackId", DBNull.Value);
                         command.Parameters.AddWithValue("@Type", "Administrator");
                     }
                     else
@@ -712,7 +718,8 @@ namespace Zuydfit.DataAccessLayer
                 connection.Open();
                 try
                 {
-                    string query = "UPDATE Person SET Firstname = @Firstname, Lastname = @Lastname, Streetname = @Streetname, Housenumber = @Housenumber, Postalcode = @Postalcode, Type = @Type, LocationId = @locationId WHERE Id = @Id";
+                    string query = "UPDATE Person SET Firstname = @Firstname, Lastname = @Lastname, Streetname = @Streetname, " +
+                        "Housenumber = @Housenumber, Postalcode = @Postalcode, Type = @Type, LocationId = @locationId, FeedbackId = @Feedback WHERE Id = @Id";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@Firstname", person.FirstName);
@@ -723,16 +730,19 @@ namespace Zuydfit.DataAccessLayer
                         if (person is Athlete athlete)
                         {
                             command.Parameters.AddWithValue("@LocationId", athlete.Location.Id);
+                            command.Parameters.AddWithValue("FeedbackId", athlete.Feedback.Id);
                             command.Parameters.AddWithValue("@Type", "Athlete");
                         }
-                        else if (person is Coach)
+                        else if (person is Coach coach)
                         {
                             command.Parameters.AddWithValue("@LocationId", DBNull.Value);
+                            command.Parameters.AddWithValue("FeedbackId", coach.Feedback.Id);
                             command.Parameters.AddWithValue("@Type", "Coach");
                         }
                         else if (person is Administrator)
                         {
                             command.Parameters.AddWithValue("@LocationId", DBNull.Value);
+                            command.Parameters.AddWithValue("FeedbackId", DBNull.Value);
                             command.Parameters.AddWithValue("@Type", "Administrator");
                         }
                         else
@@ -754,7 +764,7 @@ namespace Zuydfit.DataAccessLayer
         /// <summary>
         /// Deletes a person from the database.
         /// </summary>
-        public void DeletePerson(Person person)
+        public bool TryDeletePerson(Person person)
         {
             try
             {
@@ -763,20 +773,24 @@ namespace Zuydfit.DataAccessLayer
                     connection.Open();
 
                     // Delete associated orderlines first
-                    string DeletePersonquery = "DELETE FROM Person WHERE Id = @id";
-                    using (SqlCommand deletepersoncommand = new SqlCommand(DeletePersonquery, connection))
+                    string deletePersonQuery = "DELETE FROM Person WHERE Id = @id";
+                    using (SqlCommand deletePersonCommand = new SqlCommand(deletePersonQuery, connection))
                     {
-                        deletepersoncommand.Parameters.AddWithValue("@id", person.Id);
-                        deletepersoncommand.ExecuteNonQuery();
+                        deletePersonCommand.Parameters.AddWithValue("@id", person.Id);
+                        int rowsAffected = deletePersonCommand.ExecuteNonQuery();
+
+                        // Check if any rows were affected (person was deleted)
+                        return rowsAffected > 0;
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("An error occurred while deleting the product: " + ex.Message);
-                throw;
+                Console.WriteLine("An error occurred while deleting the person: " + ex.Message);
+                return false; // Return false to indicate deletion failure
             }
         }
+
 
         public Location UpdateLocation(Location location)
         {
@@ -868,6 +882,89 @@ namespace Zuydfit.DataAccessLayer
                     return rowsAffected > 0;
                 }
             }
+        }
+        public Feedback CreateFeedback(Feedback feedback)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "INSERT INTO Feedback  FeedbackMessage, Date) VALUES (@FeedbackMessage, @Date); SELECT SCOPE_IDENTITY();";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+
+                    command.Parameters.AddWithValue("@Text", feedback.FeedbackMessage);
+                    command.Parameters.AddWithValue("@Date", feedback.Date);
+                    int feedbackId = Convert.ToInt32(command.ExecuteScalar());
+                    feedback.Id = feedbackId;
+                }
+            }
+            return feedback;
+        }
+
+
+        public Feedback ReadFeedback(int feedbackId)
+        {
+            Feedback feedback = null;
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "SELECT Id, FeedbackMessage, Date FROM Feedback WHERE Id = @Id";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", feedbackId);
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            int id = reader.GetInt32(0);
+                            string message = reader.IsDBNull(1) ? null : reader.GetString(1);
+                            DateTime date = reader.IsDBNull(2) ? DateTime.MinValue : reader.GetDateTime(2);
+
+
+                        }
+                    }
+                }
+            }
+
+            return feedback;
+        }
+
+        public Feedback UpdateFeedback(Feedback feedback)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "UPDATE Feedback SET FeedbackMessage = @FeedbackMessage, Date = @Date WHERE Id = @Id";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@FeedbackMessage", feedback.FeedbackMessage);
+                    command.Parameters.AddWithValue("@Date", feedback.Date);
+                    command.Parameters.AddWithValue("@Id", feedback.Id);
+
+                    command.ExecuteNonQuery();
+                }
+            }
+            return feedback;
+        }
+
+
+        public bool DeleteFeedback(int feedbackId)
+        {
+            int rowsAffected = 0;
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "DELETE FROM Feedback WHERE Id = @Id";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", feedbackId);
+                    rowsAffected = command.ExecuteNonQuery();
+                }
+            }
+            // Retourneer true als er rijen zijn beïnvloed, wat aangeeft dat de verwijdering is geslaagd.
+            return rowsAffected > 0;
         }
     }
 }
