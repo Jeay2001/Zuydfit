@@ -888,11 +888,10 @@ namespace Zuydfit.DataAccessLayer
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string query = "INSERT INTO Feedback  FeedbackMessage, Date) VALUES (@FeedbackMessage, @Date); SELECT SCOPE_IDENTITY();";
+                string query = "INSERT INTO Feedback (FeedbackMessage, Date) VALUES (@FeedbackMessage, @Date); SELECT SCOPE_IDENTITY();";
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-
-                    command.Parameters.AddWithValue("@Text", feedback.FeedbackMessage);
+                    command.Parameters.AddWithValue("@FeedbackMessage", feedback.FeedbackMessage);
                     command.Parameters.AddWithValue("@Date", feedback.Date);
                     int feedbackId = Convert.ToInt32(command.ExecuteScalar());
                     feedback.Id = feedbackId;
@@ -921,16 +920,39 @@ namespace Zuydfit.DataAccessLayer
                             int id = reader.GetInt32(0);
                             string message = reader.IsDBNull(1) ? null : reader.GetString(1);
                             DateTime date = reader.IsDBNull(2) ? DateTime.MinValue : reader.GetDateTime(2);
-
-
+                            feedback = new Feedback(id, message, date);
                         }
                     }
                 }
             }
-
             return feedback;
         }
 
+        public List<Feedback> ReadAllFeedback()
+        {
+            List<Feedback> feedbacks = new List<Feedback>();
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "SELECT Id, FeedbackMessage, Date FROM Feedback";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Feedback feedback = new Feedback(
+                                reader.GetInt32(reader.GetOrdinal("Id")),
+                                reader.IsDBNull(reader.GetOrdinal("FeedbackMessage")) ? null : reader.GetString(reader.GetOrdinal("FeedbackMessage")),
+                                reader.GetDateTime(reader.GetOrdinal("Date"))
+                            );
+                            feedbacks.Add(feedback);
+                        }
+                    }
+                }
+            }
+            return feedbacks;
+        }
         public Feedback UpdateFeedback(Feedback feedback)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
