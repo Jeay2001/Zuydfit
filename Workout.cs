@@ -41,10 +41,10 @@ namespace Zuydfit
             return returnedWorkout;
         }
 
-        public Workout CreateWorkout(Workout workout)
+        public Workout CreateWorkout(Workout workout, Athlete athlete)
         {
             DAL dal = new();
-            Workout createdWorkout = dal.CreateWorkout(workout);
+            Workout createdWorkout = dal.CreateWorkout(workout, athlete);
             return createdWorkout;
         }
 
