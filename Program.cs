@@ -133,8 +133,6 @@ namespace Zuydfit
             Workout workout = new Workout(0, DateTime.Now);
             workout = workout.CreateWorkout(workout, athlete);
             int choice = DisplayMenuOptions(options, "Create workout menu", workout);
-            //PrintWorkout(workout);  
-            //Console.WriteLine("test create workout");
 
             if (choice == 1)
             {
@@ -314,7 +312,6 @@ namespace Zuydfit
             List<string> options = [
                 "Go back",
                 "Main menu",
-
             ];
             foreach (Exercise exercise in workout.Exercises)
             {
@@ -375,15 +372,19 @@ namespace Zuydfit
 
         public static void AthleteSingleWorkoutMenu(Workout workout, Athlete athlete)
         {
-            Console.Clear();
-            Console.WriteLine("");
-            Console.WriteLine("1. Edit workout");
-            Console.WriteLine("2. Delete workout");
-            Console.WriteLine("3. Go back");
-            Console.WriteLine("4. Main menu");
+            List<string> options = [
+                "Go back",
+                "Main menu",
+            ];
+            int choice = DisplayMenuOptions(options, "Create workout menu", workout);
 
-            Console.WriteLine("");
-            int choice = Convert.ToInt32(Console.ReadLine());
+            //Console.Clear();
+            //Console.WriteLine("");
+            //Console.WriteLine("1. Edit workout");
+            //Console.WriteLine("2. Delete workout");
+            //Console.WriteLine("3. Go back");
+            //Console.WriteLine("4. Main menu");
+
 
             if (choice == 1)
             {
