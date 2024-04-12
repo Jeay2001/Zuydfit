@@ -10,7 +10,7 @@ namespace Zuydfit
     {
         public List<Location> Locations { get; set; } = new List<Location>();
         public Feedback feedback { get; set; }
-
+        //test
         public Administrator(int id, string firstName, string lastName, string streetName, string houseNumber, string postalcode, List<Location> locations)
             : base(id, firstName, lastName, streetName, houseNumber, postalcode)
         {
