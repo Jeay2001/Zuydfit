@@ -11,7 +11,10 @@ namespace Zuydfit
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
+            Console.WriteLine("Welkom bij Zuydfit!");
+
+           
+
 
             //List<Workout> workouts = Workout.ReadWorkouts();
             //PrintWorkouts(workouts);
@@ -19,7 +22,7 @@ namespace Zuydfit
             Location location = new Location(1, "locatie 1", "straatnaam", "huisnummer", "1837jd", []);
             List<Feedback> feedbacks = new List<Feedback>();
             Athlete athlete = new Athlete(1, "John", "Doe", "Street", "1", "1234", [], location, feedbacks);
-
+            Administrator administrator = new Administrator(1, "karel", "kerel", "hebikniet", "66", "9999", [], []);
 
 
             List<Workout> workouts = Workout.ReadWorkouts(athlete);
@@ -30,14 +33,149 @@ namespace Zuydfit
             {
                 Console.WriteLine("Ingelogd als atleet");
                 Console.WriteLine("");
-                AthleteMainMenu(athlete);
+                AdministratorMenu(administrator);
                 flag = false;
             }
 
-            //Workout testWorkout = new Workout(1, DateTime.Now);
-            //Console.WriteLine(" Test workout");
-            //testWorkout = testWorkout.ReadWorkout(testWorkout);
-            //PrintWorkout(testWorkout);
+
+        static void AdministratorMenu(Administrator administrator)
+        {
+            List<string> options = new List<string> {
+        "View coaches",
+        "Add coach",
+        "Delete coach"
+    };
+            int choice = DisplayMenuOptions(options, "Administrator Menu");
+
+            switch (choice)
+            {
+                case 1:
+                    ViewCoaches(administrator);
+                    break;
+                case 2:
+                    AddCoach(administrator);
+                    break;
+                case 3:
+                    DeleteCoach(administrator);
+                    break;
+                default:
+                    Console.WriteLine("Invalid choice");
+                    break;
+            }
+        }
+
+        public static void ViewCoaches(Administrator administrator)
+        {
+            // Je zou de coaches moeten ophalen vanuit de data access layer of ergens anders
+            List<Coach> coaches = GetCoaches();
+
+            Console.Clear();
+            Console.WriteLine("Coaches:");
+
+            if (coaches.Count == 0)
+            {
+                Console.WriteLine("No coaches available.");
+            }
+            else
+            {
+                for (int i = 0; i < coaches.Count; i++)
+                {
+                    Console.WriteLine($"{i + 1}. {coaches[i].FirstName}");
+                }
+            }
+
+            Console.WriteLine("Press any key to go back.");
+            Console.ReadKey();
+        }
+
+        private static List<Coach> GetCoaches()
+        {
+
+            List<Coach> coaches = new List<Coach>
+    {
+                new Coach(1, "Coach 1", "LastName", "StreetName", "HouseNumber", "PostalCode", new List<Feedback>()),
+                new Coach(2, "Coach 2", "LastName", "StreetName", "HouseNumber", "PostalCode", new List<Feedback>()),
+                new Coach(3, "Coach 3", "LastName", "StreetName", "HouseNumber", "PostalCode", new List<Feedback>())
+    };
+
+            return coaches;
+        }
+
+public static void AddCoach(Administrator administrator)
+{
+    Console.Clear();
+    Console.WriteLine("Adding a new coach:");
+
+    // Vraag de gebruiker om de gegevens van de nieuwe coach in te voeren
+    Console.Write("Enter first name: ");
+    string firstName = Console.ReadLine();
+    Console.Write("Enter last name: ");
+    string lastName = Console.ReadLine();
+    Console.Write("Enter street name: ");
+    string streetName = Console.ReadLine();
+    Console.Write("Enter house number: ");
+    string houseNumber = Console.ReadLine();
+    Console.Write("Enter postal code: ");
+    string postalCode = Console.ReadLine();
+
+            // Hier kun je verdere inputvalidatie toevoegen, zoals het controleren of de ingevoerde gegevens geldig zijn
+
+            List<Feedback> feedback = new List<Feedback>();
+
+    // Maak een nieuwe coach met de ingevoerde gegevens
+    Person newCoach = new Coach(1, firstName, lastName, streetName, houseNumber, postalCode, feedback);
+    newCoach.CreatePerson();
+    // Voeg de nieuwe coach toe aan de lijst van coaches van de administrator
+    //administrator.Coaches.Add(newCoach);
+
+
+    Console.WriteLine("Coach added successfully.");
+    Console.WriteLine("Press any key to continue.");
+    Console.ReadKey();
+}
+
+
+
+
+        public static void DeleteCoach(Administrator administrator)
+        {
+            Console.Clear();
+            Console.WriteLine("Deleting a coach:");
+
+            // Laat eerst de lijst met coaches zien om te kiezen welke coach te verwijderen
+            Console.WriteLine("Select the coach to delete:");
+
+            List<Coach> coaches = administrator.Coaches;
+
+            if (coaches.Count == 0)
+            {
+                Console.WriteLine("No coaches available to delete.");
+                Console.WriteLine("Press any key to go back.");
+                Console.ReadKey();
+                return;
+            }
+
+            for (int i = 0; i < coaches.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {coaches[i].FirstName}");
+            }
+
+            // Vraag de gebruiker om de keuze van coach
+            Console.Write("Enter the number of the coach to delete: ");
+            int choice;
+            while (!int.TryParse(Console.ReadLine(), out choice) || choice < 1 || choice > coaches.Count)
+            {
+                Console.WriteLine("Invalid input. Please enter a valid number.");
+                Console.Write("Enter the number of the coach to delete: ");
+            }
+
+            // Verwijder de geselecteerde coach
+            Coach coachToDelete = coaches[choice - 1];
+            administrator.Coaches.Remove(coachToDelete);
+
+            Console.WriteLine("Coach deleted successfully.");
+            Console.WriteLine("Press any key to continue.");
+            Console.ReadKey();
         }
 
         public static int DisplayMenuOptions(List<string> options, string title = "", Workout workout = null)
