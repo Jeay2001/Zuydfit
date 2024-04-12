@@ -1,20 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Zuydfit
 {
     internal class Administrator : Person
     {
-        // Lijst van coaches die door de administrator worden beheerd
-        public List<Coach> Coaches { get; set; } = new List<Coach>();
-        public List<Location> Locations { get; set; } = new List<Location>();
 
-
-        // Constructor
-        public Administrator(int id, string firstName, string lastName, string streetName, string houseNumber, string postalcode, List<Location> locations, List<Coach> coaches)
+        public Administrator(int id, string firstName, string lastName, string streetName, string houseNumber, string postalcode)
             : base(id, firstName, lastName, streetName, houseNumber, postalcode)
         {
-            Coaches = coaches;
-            Locations = locations;       
+
         }
+
+
     }
 }
