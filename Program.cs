@@ -982,12 +982,12 @@ public static void AddCoach(Administrator administrator)
                     case 3:
                         CreateActivity();
                         break;
-                    //case 4:
-                    //    CreateFeedback(coach);
-                    //    break;
-                    //case 4:
-                    //    ReadAllFeedback(coach);
-                    //    break;
+                    case 4:
+                        CreateFeedback();
+                        break;
+                    case 5:
+                        ReadAllFeedback();
+                        break;
                     case 6: 
                         continueMenu = false;
                         break;
@@ -1114,9 +1114,36 @@ public static void AddCoach(Administrator administrator)
             Console.WriteLine("Activity Created Succesfully!");
 
         }
+        public static void CreateFeedback()
+        {
+            Console.Clear();
+            Console.WriteLine("Adding a new feedback:");
+
+            // Vraag de gebruiker om de gegevens van de nieuwe feedback in te voeren
+            Console.Write("Enter feedback message: ");
+            string message = Console.ReadLine();
+            
+            
+
+            List<Feedback> feedbacks = new List<Feedback>();
+            Feedback newFeedback = new Feedback(1, message, DateTime.Now);
+            newFeedback.CreateFeedback();
+            Console.WriteLine("Feedback Created Succesfully!");
+
+        }
+
+        public static void ReadAllFeedback()
+        {
+            List<Feedback> feedbacks = Feedback.ReadAllFeedback();
+            foreach (Feedback feedback in feedbacks)
+            {
+                Console.WriteLine($"Feedback: {feedback.Id} - {feedback.FeedbackMessage} - {feedback.Date}");
+            }
+            Console.WriteLine("Press any key to go back.");
+            Console.ReadKey();
+        }
     }
 }
-
 
 
 
