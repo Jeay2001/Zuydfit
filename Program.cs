@@ -120,8 +120,6 @@ namespace Zuydfit
         {
             List<string> options = [
                 "Add exercise",
-                "To do - Remove exercise",
-                "To do - Edit exercise",
                 "Go back",
                 "Main menu",
             ];
@@ -135,19 +133,11 @@ namespace Zuydfit
                 workout.Exercises.Add(newExercise);
                 AthleteSingleWorkout(athlete, workout);
             }
-            //else if (choice == 2)
-            //{
-            //    AthleteWorkoutRemoveExercise(workout, athlete);
-            //}
-            //else if (choice == 3)
-            //{
-            //    AthleteWorkoutEditExercise(workout, athlete);
-            //}
-            else if (choice == 4)
+            else if (choice == 2)
             {
                 AthleteViewWorkouts(athlete);
             }
-            else if (choice == 5)
+            else if (choice == 3)
             {
                 AthleteMainMenu(athlete);
             }
@@ -235,6 +225,7 @@ namespace Zuydfit
                 "Add exercise",
                 "Remove exercise",
                 "To do - Edit exercise",
+                "Delete workout",
                 "Go back",
                 "Main menu",
             ];
@@ -245,11 +236,6 @@ namespace Zuydfit
             {
                 // Add exercise
                 Exercise newExercise = CreateExercise(workout);
-                //workout.Exercises.Add(newExercise);
-                //Workout updatedWorkout = workout.ReadWorkout(workout);
-
-                // To do - data opslaan werkt nog niet
-                //newExercise.CreateExercise(workout, newExercise);
                 workout.Exercises.Add(newExercise);
                 AthleteSingleWorkout(athlete, workout);
             }
@@ -258,7 +244,6 @@ namespace Zuydfit
                 // Remove exercise
                 List<Exercise> exercises = RemoveExerciseFromList(workout.Exercises);
                 workout.Exercises = exercises;
-                // To do - database werkt nog niet
                 AthleteSingleWorkout(athlete, workout);
             }
             else if (choice == 3)
@@ -268,10 +253,18 @@ namespace Zuydfit
             }
             else if (choice == 4)
             {
-                // Previous menu
+                // Delete workout
+                // To do - delete workout
+                //AthleteViewWorkouts(athlete);
+                workout.DeleteWorkout();
                 AthleteViewWorkouts(athlete);
             }
             else if (choice == 5)
+            {
+                // Previous menu
+                AthleteViewWorkouts(athlete);
+            }
+            else if (choice == 6)
             {
                 // Main menu
                 AthleteMainMenu(athlete);

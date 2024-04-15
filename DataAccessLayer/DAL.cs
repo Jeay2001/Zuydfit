@@ -150,8 +150,6 @@ namespace Zuydfit.DataAccessLayer
         {
             using SqlConnection connection = new(connectionString);
             connection.Open();
-            //string productQuery = "select workout.id, workout.date, exercise.Id, exercise.Name, exercise.Type, exercise.duration, exercise.Distance, exercise.MachineId, sets.id, sets.Weight, sets.Reps  from personWorkout inner join workout on workout.id = personWorkout.workoutid inner join ExerciseWorkout on ExerciseWorkout.workoutid = workout.id inner join exercise on exercise.id = exerciseWorkout.ExerciseID inner join exerciseSet on exerciseSet.setId = setid full join sets on exerciseset.SetId = sets.Id " +
-            //    "where personWorkout.personid = @id";
             string workoutsQuery = "select workout.id, workout.date, exercise.Id, exercise.Name, exercise.Type, exercise.duration, exercise.Distance, exercise.MachineId, sets.Id, sets.Weight, sets.Reps from PersonWorkout " +
                 "full join workout on workout.id = workoutid " +
                 "full join ExerciseWorkout on workout.id = ExerciseWorkout.workoutid " +
@@ -170,9 +168,6 @@ namespace Zuydfit.DataAccessLayer
             Exercise previousExercise = new Strength(0, "");
             while (reader.Read())
             {
-                //Console.WriteLine("Readline");
-                //Console.WriteLine($"previousWorkout.Id { previousWorkout.Id}");
-                //Console.WriteLine($"previousExercise.Id {previousExercise.Id}");
                 int id = Convert.ToInt32(reader[0]);
                 if (previousWorkout.Id != id)
                 {
