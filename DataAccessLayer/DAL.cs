@@ -546,6 +546,22 @@ namespace Zuydfit.DataAccessLayer
             return machine;
         }
 
+        public Machine UpdateMachineLocation(Machine machine) 
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = "UPDATE MachineLocation SET LocationId = @LocationId WHERE Id = @Id";
+                SqlCommand command = new SqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@Id", machine.Id);
+                command.Parameters.AddWithValue("@LocationId", machine.Location.Id);
+
+                command.ExecuteNonQuery();
+            }
+
+            return machine;
+        }
+
         public bool DeleteMachine(Machine machine)
         {
             int rowsAffected = 0;
