@@ -46,63 +46,122 @@ namespace Zuydfit.DataAccessLayer
 
         public Exercise CreateExercise(Workout workout, Exercise exercise)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            Console.WriteLine("Creating exercise in database");
+            try
             {
-                connection.Open();
-                string query = "insert into exercise (name, type, distance, duration) values (@name, @type, @distance, @duration); SELECT SCOPE_IDENTITY();";
-                using (SqlCommand command = new SqlCommand(query, connection))
+                using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    command.Parameters.AddWithValue("@name", exercise.Name);
-
-                    if (exercise is Strength)
+                    connection.Open();
+                    string query = "insert into exercise (name, type, distance, duration) values (@name, @type, @distance, @duration); SELECT SCOPE_IDENTITY();";
+                    using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        Strength strengthExercisestrengthExercise = exercise as Strength;
-                        command.Parameters.AddWithValue("@type", "Strength");
-                        command.Parameters.AddWithValue("@duration", DBNull.Value);
-                        command.Parameters.AddWithValue("@distance", DBNull.Value);
-                        // To do - Sets toevoegen
-                    }
-                    else if (exercise is Cardio)
-                    {
-                        Cardio cardioExercise = exercise as Cardio;
-                        command.Parameters.AddWithValue("@type", "Cardio");
-                        command.Parameters.AddWithValue("@duration", cardioExercise.Duration);
-                        command.Parameters.AddWithValue("@distance", cardioExercise.Distance);
-                    }
-                    else
-                    {
-                        throw new ArgumentException("Invalid exercise type.");
-                    }
+                        command.Parameters.AddWithValue("@name", exercise.Name);
 
-                    int exerciseId = Convert.ToInt32(command.ExecuteScalar());
-                    exercise.Id = exerciseId;
+                        if (exercise is Strength)
+                        {
+                            Strength strengthExercise = exercise as Strength;
+                            command.Parameters.AddWithValue("@type", "Strength");
+                            command.Parameters.AddWithValue("@duration", DBNull.Value);
+                            command.Parameters.AddWithValue("@distance", DBNull.Value);
+                        }
+                        else if (exercise is Cardio)
+                        {
+                            Cardio cardioExercise = exercise as Cardio;
+                            command.Parameters.AddWithValue("@type", "Cardio");
+                            command.Parameters.AddWithValue("@duration", cardioExercise.Duration);
+                            command.Parameters.AddWithValue("@distance", cardioExercise.Distance);
+                        }
 
+                        int exerciseId = Convert.ToInt32(command.ExecuteScalar());
+                        exercise.Id = exerciseId;
 
-                    string personWorkoutQuery = "INSERT INTO ExerciseWorkout(exerciseId, workoutId) VALUES(@exerciseId, @workoutId);";
-                    using (SqlCommand personWorkoutCommand = new SqlCommand(personWorkoutQuery, connection))
-                    {
-                        personWorkoutCommand.Parameters.AddWithValue("@exerciseId", exercise.Id);
-                        personWorkoutCommand.Parameters.AddWithValue("@workoutId", workout.Id);
-                        personWorkoutCommand.ExecuteScalar();
-                        Console.WriteLine("inserted into exerciseWorkout");
+                        if (exercise is Strength)
+                        {
+                            Strength strengthExercise = exercise as Strength;
+                            foreach (Sets set in strengthExercise.Sets)
+                            {
+                                string setQuery = "INSERT INTO Sets (Reps, Weight) VALUES (@Reps, @Weight); SELECT SCOPE_IDENTITY();";
+                                using (SqlCommand setCommand = new SqlCommand(setQuery, connection))
+                                {
+                                    setCommand.Parameters.AddWithValue("@Reps", set.Reps);
+                                    setCommand.Parameters.AddWithValue("@Weight", set.Weight);
+                                    int setId = Convert.ToInt32(setCommand.ExecuteScalar());
+                                    set.Id = setId;
 
+                                    string exerciseSetQuery = "INSERT INTO ExerciseSet (setId, exerciseId) VALUES (@setId, @exerciseId);";
+                                    using (SqlCommand exerciseSetCommand = new SqlCommand(exerciseSetQuery, connection))
+                                    {
+                                        exerciseSetCommand.Parameters.AddWithValue("@setId", set.Id);
+                                        exerciseSetCommand.Parameters.AddWithValue("@exerciseId", exercise.Id);
+                                        exerciseSetCommand.ExecuteNonQuery();
+                                        Console.WriteLine("inserted into exerciseSet");
+                                    }
+                                }
+                            }
+                        }
+
+                        string personWorkoutQuery = "INSERT INTO ExerciseWorkout(exerciseId, workoutId) VALUES(@exerciseId, @workoutId);";
+                        using (SqlCommand personWorkoutCommand = new SqlCommand(personWorkoutQuery, connection))
+                        {
+                            personWorkoutCommand.Parameters.AddWithValue("@exerciseId", exercise.Id);
+                            personWorkoutCommand.Parameters.AddWithValue("@workoutId", workout.Id);
+                            personWorkoutCommand.ExecuteNonQuery();
+                            Console.WriteLine("inserted into exerciseWorkout");
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred while creating the exercise: " + ex.Message);
             }
             return exercise;
         }
 
+
+        public bool DeleteExercise(Exercise exercise)
+        {
+            Console.WriteLine("Removing exercise");
+            Console.WriteLine(exercise.Id);
+            Console.WriteLine(exercise.Name);
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string query = "DELETE FROM Exercise WHERE Id = @Id";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", exercise.Id);
+                        command.ExecuteNonQuery();
+                    }
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred while deleting the exercise: " + ex.Message);
+                return false;
+            }
+        }
 
 
         public List<Workout> ReadWorkouts(Athlete athlete)
         {
             using SqlConnection connection = new(connectionString);
             connection.Open();
-            string productQuery = "select workout.id, workout.date, exercise.Id, exercise.Name, exercise.Type, exercise.duration, exercise.Distance, exercise.MachineId, sets.id, sets.Weight, sets.Reps  from personWorkout inner join workout on workout.id = personWorkout.workoutid inner join ExerciseWorkout on ExerciseWorkout.workoutid = workout.id inner join exercise on exercise.id = exerciseWorkout.ExerciseID inner join exerciseSet on exerciseSet.setId = setid inner join sets on exerciseset.SetId = sets.Id " +
-                "where personWorkout.personid = @id";
-            using SqlCommand command = new(productQuery, connection);
+            string workoutsQuery = "select workout.id, workout.date, exercise.Id, exercise.Name, exercise.Type, exercise.duration, exercise.Distance, exercise.MachineId, sets.Id, sets.Weight, sets.Reps from PersonWorkout " +
+                "full join workout on workout.id = workoutid " +
+                "full join ExerciseWorkout on workout.id = ExerciseWorkout.workoutid " +
+                "full join exercise on ExerciseWorkout.ExerciseID = exercise.id " +
+                "full join exerciseSet on exerciseSet.exerciseId = exercise.id " +
+                "full join sets on exerciseSet.setId = sets.Id " +
+                "where personid = @id";
+            using SqlCommand command = new(workoutsQuery, connection);
             command.Parameters.AddWithValue("@Id", athlete.Id);
             using SqlDataReader reader = command.ExecuteReader();
+
+
 
 
             Workout previousWorkout = new Workout(0, new DateTime());
@@ -118,42 +177,46 @@ namespace Zuydfit.DataAccessLayer
                     Workouts.Add(workout);
                 }
 
-                int exerciseId = Convert.ToInt32(reader[2]);
-                string name = reader[3].ToString();
-                string type = reader[6].ToString();
-
-                if (type.ToLower() == "strength")
+                if (reader[2] != DBNull.Value)
                 {
-                    if (previousExercise.Id != exerciseId)
-                    {
-                        Strength strengthExercise = new Strength(exerciseId, name, []);
-                        previousWorkout.Exercises.Add(strengthExercise);
-                        previousExercise = strengthExercise;
-                    }
+                    int exerciseId = Convert.ToInt32(reader[2]);
+                    string name = reader[3].ToString();
+                    string type = reader[4].ToString();
 
-                    if (reader[7] != DBNull.Value)
+                    if (type.ToLower() == "strength")
                     {
-                        int setsId = Convert.ToInt32(reader[7]);
-                        int amount = Convert.ToInt32(reader[8]);
-                        int weight = Convert.ToInt32(reader[9]);
-                        Sets set = new Sets(setsId, amount, weight);
+                        if (previousExercise.Id != exerciseId)
+                        {
+                            Strength strengthExercise = new Strength(exerciseId, name, []);
+                            previousWorkout.Exercises.Add(strengthExercise);
+                            previousExercise = strengthExercise;
+                        }
 
-                        Strength previousStrengthExercise = previousExercise as Strength;
-                        previousStrengthExercise.Sets.Add(set);
+                        if (reader[8] != DBNull.Value)
+                        {
+
+                            int setId = Convert.ToInt32(reader[8]);
+                            int amount = Convert.ToInt32(reader[9]);
+                            int weight = Convert.ToInt32(reader[10]);
+                            Sets set = new Sets(setId, amount, weight);
+                            Strength previousStrengthExercise = previousExercise as Strength;
+                            previousStrengthExercise.Sets.Add(set);
+                        }
                     }
-                }
-                else if (type.ToLower() == "cardio")
-                {
-                    string duration = Convert.ToString(reader[4]);
-                    string distance = Convert.ToString(reader[5]);
-                    if (previousExercise.Id != exerciseId)
+                    else if (type.ToLower() == "cardio")
                     {
-                        Cardio cardioExercise = new Cardio(exerciseId, name, duration, distance);
-                        previousWorkout.Exercises.Add(cardioExercise);
-                        previousExercise = cardioExercise;
+                        string duration = Convert.ToString(reader[5]);
+                        string distance = Convert.ToString(reader[6]);
+                        if (previousExercise.Id != exerciseId)
+                        {
+                            Cardio cardioExercise = new Cardio(exerciseId, name, duration, distance);
+                            previousWorkout.Exercises.Add(cardioExercise);
+                            previousExercise = cardioExercise;
+                        }
                     }
                 }
             }
+
             return Workouts;
         }
 
@@ -163,8 +226,14 @@ namespace Zuydfit.DataAccessLayer
 
             using SqlConnection connection = new(connectionString);
             connection.Open();
-            string productQuery = "select workout.id, workout.date, exercise.Id, exercise.Name, exercise.Type, exercise.duration, exercise.Distance, exercise.MachineId, sets.id, sets.Weight, sets.Reps  from personWorkout inner join workout on workout.id = personWorkout.workoutid inner join ExerciseWorkout on ExerciseWorkout.workoutid = workout.id inner join exercise on exercise.id = exerciseWorkout.ExerciseID inner join exerciseSet on exerciseSet.setId = setid inner join sets on exerciseset.SetId = sets.Id " +
-                "where personWorkout.workoutId = @id";
+            string productQuery = "select workout.id, workout.date, exercise.Id, exercise.Name, exercise.Type, exercise.duration, exercise.Distance, exercise.MachineId, sets.id, sets.Weight, sets.Reps from PersonWorkout " +
+                "join workout on workout.id = workoutid " +
+                "join ExerciseWorkout on workout.id = ExerciseWorkout.workoutid " +
+                "join exercise on ExerciseWorkout.ExerciseID = exercise.id " +
+                "full join exerciseSet on exerciseSet.exerciseId = exercise.id " +
+                "full join sets on exerciseSet.setId = sets.Id " +
+                "where workout.id = @id";
+
             using SqlCommand command = new(productQuery, connection);
             command.Parameters.AddWithValue("@Id", workout.Id);
             using SqlDataReader reader = command.ExecuteReader();
@@ -176,7 +245,6 @@ namespace Zuydfit.DataAccessLayer
             int index = 0;
             while (reader.Read())
             {
-                Console.WriteLine("reader line");
                 if (index == 0)
                 {
                     int id = Convert.ToInt32(reader[0]);
@@ -184,12 +252,11 @@ namespace Zuydfit.DataAccessLayer
                     newWorkout = new Workout(id, date);
                     index++;
                 }
-                    
+                
                 int exerciseId = Convert.ToInt32(reader[2]);
                 string name = reader[3].ToString();
                 string type = reader[4].ToString();
 
-                Console.WriteLine(type);
 
                 if (type.ToLower() == "strength")
                 {
@@ -205,7 +272,6 @@ namespace Zuydfit.DataAccessLayer
                         int amount = Convert.ToInt32(reader[9]);
                         int weight = Convert.ToInt32(reader[10]);
                         Sets set = new Sets(setsId, amount, weight);
-
 
                         // Find current exercise and add set
                         Strength currentExercise = (Strength)newWorkout.Exercises.Find(exercise => exercise.Id == exerciseId);
@@ -227,7 +293,6 @@ namespace Zuydfit.DataAccessLayer
                     {
                         Cardio cardioExercise = new Cardio(exerciseId, name, duration, distance);
                         newWorkout.Exercises.Add(cardioExercise);
-                        //previousExercise = cardioExercise;
                     }
                 }
                 previousExerciseId = exerciseId;
@@ -474,6 +539,22 @@ namespace Zuydfit.DataAccessLayer
                 SqlCommand command = new SqlCommand(sql, connection);
                 command.Parameters.AddWithValue("@Id", machine.Id);
                 command.Parameters.AddWithValue("@Name", machine.Name);
+
+                command.ExecuteNonQuery();
+            }
+
+            return machine;
+        }
+
+        public Machine UpdateMachineLocation(Machine machine) 
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = "UPDATE MachineLocation SET LocationId = @LocationId WHERE Id = @Id";
+                SqlCommand command = new SqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@Id", machine.Id);
+                command.Parameters.AddWithValue("@LocationId", machine.Location.Id);
 
                 command.ExecuteNonQuery();
             }
