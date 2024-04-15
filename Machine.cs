@@ -11,6 +11,7 @@ namespace Zuydfit
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public Location Location { get; set; }
 
         public Machine(int id, string name)
         {
@@ -20,6 +21,12 @@ namespace Zuydfit
 
         public Machine()
         {
+        }
+
+        public void UpdateMachineLocation()
+        {
+            DAL dal = new DAL();
+            dal.UpdateMachineLocation(this);
         }
 
         public static List<Machine> ReadMachines()
