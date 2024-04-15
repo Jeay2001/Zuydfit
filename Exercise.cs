@@ -32,5 +32,13 @@ namespace Zuydfit
             return createdExercise;
         }
 
+
+        public bool DeleteExercise()
+        {
+            DAL dal = new DAL();
+            bool removed = dal.DeleteExercise(this);
+            return removed;
+        }
+
     }
 }
