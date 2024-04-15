@@ -21,7 +21,6 @@ namespace Zuydfit
             Athlete athlete = new Athlete(1, "John", "Doe", "Street", "1", "1234", [], location, feedbacks);
             Coach coach = new Coach(1, "zuch", "mabaulz", "zweetweg", "69", "4200", []);
             Administrator administrator = new Administrator(1, "karel", "kerel", "hebikniet", "66", "9999", []);
-            Coach coach = new Coach(1, "zuch", "mabaulz", "zweetweg", "69", "4200", []);
 
 
 
@@ -704,60 +703,7 @@ namespace Zuydfit
             Console.WriteLine("Activity Created Succesfully!");
 
         }
-
-
-        /* Print Method's */
-        public static void PrintWorkouts(List<Workout> workouts)
-        {
-            foreach (Workout workout in workouts)
-            {
-                PrintWorkout(workout);
-                Console.WriteLine();
-            }
-        }
-
-        public static void PrintWorkout(Workout workout)
-        {
-            Console.WriteLine($"Workout Date: {workout.Date.ToString("dd/MM/yyyy")}");
-
-
-            foreach (Exercise exercise in workout.Exercises)
-            {
-                Console.WriteLine($"Exercise: {exercise.Name}");
-
-                if (exercise is Cardio)
-                {
-                    Cardio cardio = (Cardio)exercise;
-                    Console.WriteLine($"  Type: Cardio");
-                    if (cardio.Duration != "")
-                    {
-                        Console.WriteLine($"  Duration: {cardio.Duration}");
-                    }
-                    if (cardio.Distance != "")
-                    {
-                        Console.WriteLine($"  Distance: {cardio.Distance}");
-                    }
-                }
-                else if (exercise is Strength)
-                {
-                    Strength strength = (Strength)exercise;
-                    if (strength.Sets.Count > 0)
-                    {
-                        Console.WriteLine("  Sets:");
-                        foreach (Sets set in strength.Sets)
-                        {
-                            Console.WriteLine($"    - Weight: {set.Weight} Reps: {set.Reps}");
-                        }
-                    }
-                }
-                Console.WriteLine();
-            }
-        }
-        // keuze menu coach
-        //
-        //
-        //
-        //
+        
         static void CoachMenu(Coach coach)
         {
             bool continueMenu = true;
@@ -799,32 +745,6 @@ namespace Zuydfit
                         break;
                 }
             }
-        }
-        public static void Createperson()
-        {
-            Console.Clear();
-            Console.WriteLine("Adding a new person:");
-
-            // Verzamel de gegevens van de nieuwe persoon
-            Console.Write("Enter first name: ");
-            string firstName = Console.ReadLine();
-            Console.Write("Enter last name: ");
-            string lastName = Console.ReadLine();
-            Console.Write("Enter street name: ");
-            string streetName = Console.ReadLine();
-            Console.Write("Enter house number: ");
-            string houseNumber = Console.ReadLine();
-            Console.Write("Enter postal code: ");
-            string postalCode = Console.ReadLine();
-
-            // Hier kun je verdere inputvalidatie toevoegen, zoals het controleren of de ingevoerde gegevens geldig zijn
-
-            List<Feedback> feedback = new List<Feedback>();
-            Location location = new Location(1, "locatie 1", "straatnaam", "huisnummer", "1837jd", []);
-            // Maak een nieuwe person met de ingevoerde gegevens
-            Person newPerson = new Athlete(1, firstName, lastName, streetName, houseNumber, postalCode, location, feedback);
-            newPerson.CreatePerson();
-            Console.WriteLine("Athlete added succesfully!");
         }
 
         public static void AthleteProgression()
@@ -897,6 +817,84 @@ namespace Zuydfit
             //    Console.WriteLine("Invalid choice");
             //}
         }
+        
+        public static void CreateFeedback()
+        {
+            Console.Clear();
+            Console.WriteLine("Adding a new feedback:");
+
+            // Vraag de gebruiker om de gegevens van de nieuwe feedback in te voeren
+            Console.Write("Enter feedback message: ");
+            string message = Console.ReadLine();
+
+
+
+            List<Feedback> feedbacks = new List<Feedback>();
+            Feedback newFeedback = new Feedback(1, message, DateTime.Now);
+            newFeedback.CreateFeedback();
+            Console.WriteLine("Feedback Created Succesfully!");
+
+        }
+
+        public static void ReadAllFeedback()
+        {
+            List<Feedback> feedbacks = Feedback.ReadAllFeedback();
+            foreach (Feedback feedback in feedbacks)
+            {
+                Console.WriteLine($"Feedback: {feedback.Id} - {feedback.FeedbackMessage} - {feedback.Date}");
+            }
+            Console.WriteLine("Press any key to go back.");
+            Console.ReadKey();
+        }
+
+        /* Print Method's */
+        public static void PrintWorkouts(List<Workout> workouts)
+        {
+            foreach (Workout workout in workouts)
+            {
+                PrintWorkout(workout);
+                Console.WriteLine();
+            }
+        }
+
+        public static void PrintWorkout(Workout workout)
+        {
+            Console.WriteLine($"Workout Date: {workout.Date.ToString("dd/MM/yyyy")}");
+
+
+            foreach (Exercise exercise in workout.Exercises)
+            {
+                Console.WriteLine($"Exercise: {exercise.Name}");
+
+                if (exercise is Cardio)
+                {
+                    Cardio cardio = (Cardio)exercise;
+                    Console.WriteLine($"  Type: Cardio");
+                    if (cardio.Duration != "")
+                    {
+                        Console.WriteLine($"  Duration: {cardio.Duration}");
+                    }
+                    if (cardio.Distance != "")
+                    {
+                        Console.WriteLine($"  Distance: {cardio.Distance}");
+                    }
+                }
+                else if (exercise is Strength)
+                {
+                    Strength strength = (Strength)exercise;
+                    if (strength.Sets.Count > 0)
+                    {
+                        Console.WriteLine("  Sets:");
+                        foreach (Sets set in strength.Sets)
+                        {
+                            Console.WriteLine($"    - Weight: {set.Weight} Reps: {set.Reps}");
+                        }
+                    }
+                }
+                Console.WriteLine();
+            }
+        }
+
 
         public static int DisplayMenuOptions(List<string> options, string title = "", Workout workout = null, bool clearConsole = true)
         {
@@ -920,34 +918,6 @@ namespace Zuydfit
             Console.WriteLine("");
             int choice = Convert.ToInt32(Console.ReadLine());
             return choice;
-        }
-        public static void CreateFeedback()
-        {
-            Console.Clear();
-            Console.WriteLine("Adding a new feedback:");
-
-            // Vraag de gebruiker om de gegevens van de nieuwe feedback in te voeren
-            Console.Write("Enter feedback message: ");
-            string message = Console.ReadLine();
-
-
-
-            List<Feedback> feedbacks = new List<Feedback>();
-            Feedback newFeedback = new Feedback(1, message, DateTime.Now);
-            newFeedback.CreateFeedback(newFeedback);
-            Console.WriteLine("Feedback Created Succesfully!");
-
-        }
-
-        public static void ReadAllFeedback()
-        {
-            List<Feedback> feedbacks = Feedback.ReadAllFeedback();
-            foreach (Feedback feedback in feedbacks)
-            {
-                Console.WriteLine($"Feedback: {feedback.Id} - {feedback.FeedbackMessage} - {feedback.Date}");
-            }
-            Console.WriteLine("Press any key to go back.");
-            Console.ReadKey();
         }
     }
 }
