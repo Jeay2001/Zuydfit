@@ -37,10 +37,10 @@ namespace Zuydfit
             return feedbacks;
         }
 
-        public Feedback CreateFeedback(Feedback feedback)
+        public Feedback CreateFeedback()
         {
             DAL dal = new();
-            Feedback returnedFeedback = dal.CreateFeedback(feedback);
+            Feedback returnedFeedback = dal.CreateFeedback(this);
             return returnedFeedback;
         }
 

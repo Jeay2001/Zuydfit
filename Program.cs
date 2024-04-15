@@ -21,6 +21,7 @@ namespace Zuydfit
             Athlete athlete = new Athlete(1, "John", "Doe", "Street", "1", "1234", [], location, feedbacks);
             Coach coach = new Coach(1, "zuch", "mabaulz", "zweetweg", "69", "4200", []);
             Administrator administrator = new Administrator(1, "karel", "kerel", "hebikniet", "66", "9999", []);
+            Coach coach = new Coach(1, "zuch", "mabaulz", "zweetweg", "69", "4200", []);
 
 
 
@@ -751,6 +752,150 @@ namespace Zuydfit
                 }
                 Console.WriteLine();
             }
+        }
+        // keuze menu coach
+        //
+        //
+        //
+        //
+        static void CoachMenu(Coach coach)
+        {
+            bool continueMenu = true;
+            while (continueMenu)
+            {
+                Console.Clear();
+                List<string> options = new List<string> {
+            "Add Athlete",
+            "Show Athlete Progression",
+            "Add Activity for athlete",
+            "Give Athlete Feedback",
+            "Read Athlete Feedback",
+            "Exit"
+        };
+                int choice = DisplayMenuOptions(options, "Coach Menu");
+
+                switch (choice)
+                {
+                    case 1:
+                        Createperson();
+                        break;
+                    case 2:
+                        AthleteProgression();
+                        break;
+                    case 3:
+                        CreateActivity();
+                        break;
+                    case 4:
+                        CreateFeedback();
+                        break;
+                    case 5:
+                        ReadAllFeedback();
+                        break;
+                    case 6: 
+                        continueMenu = false;
+                        break;
+                    default:
+                        Console.WriteLine("Invalid choice. Please try again.");
+                        break;
+                }
+            }
+        }
+        public static void Createperson()
+        {
+            Console.Clear();
+            Console.WriteLine("Adding a new person:");
+
+            // Verzamel de gegevens van de nieuwe persoon
+            Console.Write("Enter first name: ");
+            string firstName = Console.ReadLine();
+            Console.Write("Enter last name: ");
+            string lastName = Console.ReadLine();
+            Console.Write("Enter street name: ");
+            string streetName = Console.ReadLine();
+            Console.Write("Enter house number: ");
+            string houseNumber = Console.ReadLine();
+            Console.Write("Enter postal code: ");
+            string postalCode = Console.ReadLine();
+
+            // Hier kun je verdere inputvalidatie toevoegen, zoals het controleren of de ingevoerde gegevens geldig zijn
+
+            List<Feedback> feedback = new List<Feedback>();
+            Location location = new Location(1, "locatie 1", "straatnaam", "huisnummer", "1837jd", []);
+            // Maak een nieuwe person met de ingevoerde gegevens
+            Person newPerson = new Athlete(1, firstName, lastName, streetName, houseNumber, postalCode, location, feedback);
+            newPerson.CreatePerson();
+            Console.WriteLine("Athlete added succesfully!");
+        }
+
+        public static void AthleteProgression()
+        {
+            List<Person> persons = Person.GetPersons();
+            foreach (Person person in persons)
+            {
+                if (person is Athlete)
+                {
+                    Console.WriteLine($"Athlete: {person.Id} - {person.FirstName} {person.LastName}");
+                }
+            }
+            Console.WriteLine("Choose a person to view progression:");
+            int id = Convert.ToInt32(Console.ReadLine());
+            if (persons.Find(p => p.Id == id) is Athlete athlete)
+            {
+                List<string> options = [
+                "Go back",
+            ];
+
+                int[] data = { 5, 6, 8, 10, 11, 11, 8, 9, 12, 15 }; // Sample data
+
+                // Find the maximum value in the data
+                int maxValue = 0;
+                foreach (int value in data)
+                {
+                    if (value > maxValue)
+                        maxValue = value;
+                }
+
+                // Draw the graph
+                Console.WriteLine("   ^");
+                Console.WriteLine("   |");
+                Console.WriteLine("   |");
+                for (int i = maxValue; i > 0; i--)
+                {
+                    Console.Write($"   |");
+                    foreach (int value in data)
+                    {
+                        if (value >= i)
+                            Console.Write(" * ");
+                        else
+                            Console.Write("   ");
+                    }
+                    Console.WriteLine();
+                }
+
+                // Print the x-axis labels
+                Console.Write("   +");
+                for (int i = 0; i < data.Length * 3; i++)
+                {
+                    Console.Write("-");
+                }
+                Console.WriteLine(">");
+            }
+            else
+            {
+                Console.WriteLine("Invalid choice");
+            }
+
+
+            //int choice = DisplayMenuOptions(options, "View your progression", null, false);
+
+            //if (choice == 1)
+            //{
+            //    AthleteMainMenu(athlete);
+            //}
+            //else
+            //{
+            //    Console.WriteLine("Invalid choice");
+            //}
         }
 
         public static int DisplayMenuOptions(List<string> options, string title = "", Workout workout = null, bool clearConsole = true)
