@@ -11,11 +11,15 @@ namespace Zuydfit
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
+            Console.WriteLine("Welkom bij Zuydfit!");
+
+            //List<Workout> workouts = Workout.ReadWorkouts();
+            //PrintWorkouts(workouts);
 
             Location location = new Location(1, "locatie 1", "straatnaam", "huisnummer", "1837jd", []);
             List<Feedback> feedbacks = new List<Feedback>();
             Athlete athlete = new Athlete(1, "John", "Doe", "Street", "1", "1234", [], location, feedbacks);
+            Administrator administrator = new Administrator(1, "karel", "kerel", "hebikniet", "66", "9999", []);
 
 
             List<Workout> workouts = Workout.ReadWorkouts(athlete);
@@ -26,8 +30,234 @@ namespace Zuydfit
             {
                 Console.WriteLine("Ingelogd als atleet");
                 Console.WriteLine("");
-                AthleteMainMenu(athlete);
+                AdministratorMenu(administrator);
                 flag = false;
+            }
+        }
+
+        static void AdministratorMenu(Administrator administrator)
+        {
+            List<string> options = new List<string> {
+        "View coaches",
+        "Add coach",
+        "Delete coach",
+        "Update coach"
+    };
+            int choice = DisplayMenuOptions(options, "Administrator Menu");
+
+            switch (choice)
+            {
+                case 1:
+                    ViewCoaches(administrator);
+                    break;
+                case 2:
+                    AddCoach(administrator);
+                    break;
+                case 3:
+                    DeleteCoach(administrator);
+                    break;
+                case 4:
+                    UpdateCoach(administrator);
+                    break;
+                default:
+                    Console.WriteLine("Invalid choice");
+                    break;
+            }
+        }
+
+        public static void ViewCoaches(Administrator administrator)
+        {
+            // Je zou de coaches moeten ophalen vanuit de data access layer of ergens anders
+            List<Coach> coaches = GetCoaches();
+
+            Console.Clear();
+            Console.WriteLine("Coaches:");
+
+            List<Person> persons = Person.GetPersons();
+            foreach (Person person in persons)
+            {
+                if (person is Coach)
+                {
+                    Console.WriteLine($"Coach: {person.Id} - {person.FirstName} {person.LastName}");
+                }
+            }
+
+            Console.WriteLine("Press any key to go back.");
+            Console.ReadKey();
+        }
+
+        private static List<Coach> GetCoaches()
+        {
+
+            List<Coach> coaches = new List<Coach>
+    {
+                new Coach(1, "Coach 1", "LastName", "StreetName", "HouseNumber", "PostalCode", new List<Feedback>()),
+                new Coach(2, "Coach 2", "LastName", "StreetName", "HouseNumber", "PostalCode", new List<Feedback>()),
+                new Coach(3, "Coach 3", "LastName", "StreetName", "HouseNumber", "PostalCode", new List<Feedback>())
+    };
+
+            return coaches;
+        }
+
+public static void AddCoach(Administrator administrator)
+{
+    Console.Clear();
+    Console.WriteLine("Adding a new coach:");
+
+    // Vraag de gebruiker om de gegevens van de nieuwe coach in te voeren
+    Console.Write("Enter first name: ");
+    string firstName = Console.ReadLine();
+    Console.Write("Enter last name: ");
+    string lastName = Console.ReadLine();
+    Console.Write("Enter street name: ");
+    string streetName = Console.ReadLine();
+    Console.Write("Enter house number: ");
+    string houseNumber = Console.ReadLine();
+    Console.Write("Enter postal code: ");
+    string postalCode = Console.ReadLine();
+
+            // Hier kun je verdere inputvalidatie toevoegen, zoals het controleren of de ingevoerde gegevens geldig zijn
+
+            List<Feedback> feedback = new List<Feedback>();
+
+    // Maak een nieuwe coach met de ingevoerde gegevens
+    Person newCoach = new Coach(1, firstName, lastName, streetName, houseNumber, postalCode, feedback);
+    newCoach.CreatePerson();
+    // Voeg de nieuwe coach toe aan de lijst van coaches van de administrator
+    //administrator.Coaches.Add(newCoach);
+
+
+    Console.WriteLine("Coach added successfully.");
+    Console.WriteLine("Press any key to continue.");
+    Console.ReadKey();
+}
+
+
+
+
+        public static void DeleteCoach(Administrator administrator)
+        {
+            Console.Clear();
+            Console.WriteLine("Deleting a coach:");
+
+            // Laat eerst de lijst met coaches zien om te kiezen welke coach te verwijderen
+            Console.WriteLine("Select the coach to delete:");
+
+            List<Person> persons = Person.GetPersons();
+            foreach (Person person in persons)
+            {
+                if (person is Coach)
+                {
+                    Console.WriteLine($"Coach: {person.Id} - {person.FirstName} {person.LastName}");
+                }
+            }
+
+            if (persons.Count == 0)
+            {
+                Console.WriteLine("No coaches available to delete.");
+                Console.WriteLine("Press any key to go back.");
+                Console.ReadKey();
+                return;
+            }
+
+            // Vraag de gebruiker om de keuze van coach
+            Console.WriteLine("Enter the number of the coach to delete: ");
+            int id = Convert.ToInt32(Console.ReadLine());
+            Person personToUpdate = persons.Find(p => p.Id == id);
+            personToUpdate.DeletePerson();
+
+            Console.WriteLine("Coach deleted successfully.");
+            Console.WriteLine("Press any key to continue.");
+            Console.ReadKey();
+        }
+
+        public static void UpdateCoach(Administrator administrator)
+        {
+            static string InputValue(string prompt)
+            {
+                Console.WriteLine(prompt);
+                string input = Console.ReadLine();
+                while (string.IsNullOrEmpty(input))
+                {
+                    Console.WriteLine(prompt + " cannot be empty. Please enter a value:");
+                    input = Console.ReadLine();
+                }
+                return input;
+            }
+            List<Person> persons = Person.GetPersons();
+            foreach (Person person in persons)
+            {
+                if (person is Coach)
+                {
+                    Console.WriteLine($"Coach: {person.Id} - {person.FirstName} {person.LastName}");
+                }
+            }
+            Console.WriteLine("Choose a person to Update:");
+            int id = Convert.ToInt32(Console.ReadLine());
+            Person personToUpdate = persons.Find(p => p.Id == id);
+
+            if (personToUpdate != null)
+            {
+                Console.Clear();
+                Console.WriteLine("Choose what you want to update:");
+                Console.WriteLine("1. First Name");
+                Console.WriteLine("2. Last Name");
+                Console.WriteLine("3. Street Name");
+                Console.WriteLine("4. House Number");
+                Console.WriteLine("5. Postal Code");
+
+                if (personToUpdate is Coach)
+                {
+                    Console.WriteLine("6. Feedback ID");
+                }
+
+                Console.WriteLine("Enter your choice:");
+                string updateChoice = Console.ReadLine();
+                switch (updateChoice)
+                {
+                    case "1":
+                        personToUpdate.FirstName = InputValue("First Name");
+                        break;
+                    case "2":
+                        personToUpdate.LastName = InputValue("Last Name");
+                        break;
+                    case "3":
+                        personToUpdate.StreetName = InputValue("Street Name");
+                        break;
+                    case "4":
+                        personToUpdate.HouseNumber = InputValue("House Number");
+                        break;
+                    case "5":
+                        personToUpdate.PostalCode = InputValue("Postal Code");
+                        break;
+                    case "6":
+                        if (personToUpdate is Athlete athleteToUpdate)
+                        {
+
+                            int locationId = Convert.ToInt32(InputValue("Location ID"));
+                            athleteToUpdate.Location.Id = locationId;
+                        }
+                        else if (personToUpdate is Coach coachToUpdate)
+                        {
+                            int feedbackId = Convert.ToInt32(InputValue("Feedback ID"));
+                            coachToUpdate.Feedback.Id = feedbackId;
+                        }
+                        break;
+                    case "7":
+                        if (personToUpdate is Athlete athleteToUpdateFeedback)
+                        {
+                            int feedbackId = Convert.ToInt32(InputValue("Feedback ID"));
+                            athleteToUpdateFeedback.Feedback.Id = feedbackId;
+                        }
+                        break;
+                    default:
+                        Console.WriteLine("Invalid choice. Please try again.");
+                        break;
+                }
+                personToUpdate.UpdatePerson();
+                Console.WriteLine("Person updated successfully!");
+                Console.WriteLine("==============");
+
             }
 
         }
