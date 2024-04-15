@@ -30,7 +30,7 @@ namespace Zuydfit
             Feedback returnedFeedback = dal.ReadFeedback(feedback.Id);
             return returnedFeedback;
         }
-        public List<Feedback> ReadAllFeedback()
+        public static List<Feedback> ReadAllFeedback()
         {
             DAL dal = new DAL();
             List<Feedback> feedbacks = dal.ReadAllFeedback();

@@ -776,9 +776,9 @@ namespace Zuydfit.DataAccessLayer
                     else if (person is Administrator administrator)
                     {
                         command.Parameters.AddWithValue("@LocationId", DBNull.Value);
-                        if (administrator.feedback != null)
+                        if (administrator.Feedback != null)
                         {
-                            command.Parameters.AddWithValue("@FeedbackId", administrator.feedback.Id);
+                            command.Parameters.AddWithValue("@FeedbackId", administrator.Feedback.Id);
                         }
                         else
                         {
@@ -852,9 +852,9 @@ namespace Zuydfit.DataAccessLayer
                         else if (person is Administrator administrator)
                         {
                             command.Parameters.AddWithValue("@LocationId", DBNull.Value);
-                            if (administrator.feedback != null)
+                            if (administrator.Feedback != null)
                             {
-                                command.Parameters.AddWithValue("@FeedbackId", administrator.feedback.Id);
+                                command.Parameters.AddWithValue("@FeedbackId", administrator.Feedback.Id);
                             }
                             else
                             {

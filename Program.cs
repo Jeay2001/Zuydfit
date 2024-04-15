@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using Zuydfit;
@@ -13,51 +14,74 @@ namespace Zuydfit
         {
             Console.WriteLine("Welkom bij Zuydfit!");
 
-            //List<Workout> workouts = Workout.ReadWorkouts();
-            //PrintWorkouts(workouts);
 
             Location location = new Location(1, "locatie 1", "straatnaam", "huisnummer", "1837jd", []);
             List<Feedback> feedbacks = new List<Feedback>();
+
             Athlete athlete = new Athlete(1, "John", "Doe", "Street", "1", "1234", [], location, feedbacks);
+            Coach coach = new Coach(1, "zuch", "mabaulz", "zweetweg", "69", "4200", []);
             Administrator administrator = new Administrator(1, "karel", "kerel", "hebikniet", "66", "9999", []);
 
 
-            List<Workout> workouts = Workout.ReadWorkouts(athlete);
-            PrintWorkouts(workouts);
 
             bool flag = true;
             while (flag)
             {
-                Console.WriteLine("Ingelogd als atleet");
                 Console.WriteLine("");
-                AdministratorMenu(administrator);
+                MainMenu(athlete, coach, administrator);
                 flag = false;
             }
         }
 
-        static void AdministratorMenu(Administrator administrator)
+
+        /* Main Menu */
+        public static void MainMenu(Athlete athlete, Coach coach, Administrator administrator)
         {
             List<string> options = new List<string> {
-        "View coaches",
-        "Add coach",
-        "Delete coach",
-        "Update coach"
-    };
+                "Athlete",
+                "Coach",
+                "Administrator",
+            };
+            int choice = DisplayMenuOptions(options, "Main menu - select the type you want to login with");
+            switch (choice)
+            {
+                case 1:
+                    AthleteMainMenu(athlete);
+                    break;
+                case 2:
+                    CoachMainMenu(coach);
+                    break;
+                case 3:
+                    AdministratorMainMenu(administrator);
+                    break;
+            }
+        }
+
+        /* Administrator menu's */
+
+        static void AdministratorMainMenu(Administrator administrator)
+        {
+            List<string> options = new List<string> {
+                "View coaches",
+                "Add coach",
+                "Delete coach",
+                "Update coach"
+            };
             int choice = DisplayMenuOptions(options, "Administrator Menu");
 
             switch (choice)
             {
                 case 1:
-                    ViewCoaches(administrator);
+                    ViewCoaches();
                     break;
                 case 2:
-                    AddCoach(administrator);
+                    AddCoach();
                     break;
                 case 3:
-                    DeleteCoach(administrator);
+                    DeleteCoach();
                     break;
                 case 4:
-                    UpdateCoach(administrator);
+                    UpdateCoach();
                     break;
                 default:
                     Console.WriteLine("Invalid choice");
@@ -65,10 +89,8 @@ namespace Zuydfit
             }
         }
 
-        public static void ViewCoaches(Administrator administrator)
+        public static void ViewCoaches()
         {
-            // Je zou de coaches moeten ophalen vanuit de data access layer of ergens anders
-            List<Coach> coaches = GetCoaches();
 
             Console.Clear();
             Console.WriteLine("Coaches:");
@@ -86,61 +108,41 @@ namespace Zuydfit
             Console.ReadKey();
         }
 
-        private static List<Coach> GetCoaches()
+        public static void AddCoach()
         {
+            Console.Clear();
+            Console.WriteLine("Adding a new coach:");
 
-            List<Coach> coaches = new List<Coach>
-    {
-                new Coach(1, "Coach 1", "LastName", "StreetName", "HouseNumber", "PostalCode", new List<Feedback>()),
-                new Coach(2, "Coach 2", "LastName", "StreetName", "HouseNumber", "PostalCode", new List<Feedback>()),
-                new Coach(3, "Coach 3", "LastName", "StreetName", "HouseNumber", "PostalCode", new List<Feedback>())
-    };
-
-            return coaches;
-        }
-
-public static void AddCoach(Administrator administrator)
-{
-    Console.Clear();
-    Console.WriteLine("Adding a new coach:");
-
-    // Vraag de gebruiker om de gegevens van de nieuwe coach in te voeren
-    Console.Write("Enter first name: ");
-    string firstName = Console.ReadLine();
-    Console.Write("Enter last name: ");
-    string lastName = Console.ReadLine();
-    Console.Write("Enter street name: ");
-    string streetName = Console.ReadLine();
-    Console.Write("Enter house number: ");
-    string houseNumber = Console.ReadLine();
-    Console.Write("Enter postal code: ");
-    string postalCode = Console.ReadLine();
-
-            // Hier kun je verdere inputvalidatie toevoegen, zoals het controleren of de ingevoerde gegevens geldig zijn
+            Console.Write("Enter first name: ");
+            string firstName = Console.ReadLine();
+            Console.Write("Enter last name: ");
+            string lastName = Console.ReadLine();
+            Console.Write("Enter street name: ");
+            string streetName = Console.ReadLine();
+            Console.Write("Enter house number: ");
+            string houseNumber = Console.ReadLine();
+            Console.Write("Enter postal code: ");
+            string postalCode = Console.ReadLine();
 
             List<Feedback> feedback = new List<Feedback>();
 
-    // Maak een nieuwe coach met de ingevoerde gegevens
-    Person newCoach = new Coach(1, firstName, lastName, streetName, houseNumber, postalCode, feedback);
-    newCoach.CreatePerson();
-    // Voeg de nieuwe coach toe aan de lijst van coaches van de administrator
-    //administrator.Coaches.Add(newCoach);
+            // Maak een nieuwe coach met de ingevoerde gegevens
+            Person newCoach = new Coach(1, firstName, lastName, streetName, houseNumber, postalCode, feedback);
+            newCoach.CreatePerson();
+            // Voeg de nieuwe coach toe aan de lijst van coaches van de administrator
+            //administrator.Coaches.Add(newCoach);
 
 
-    Console.WriteLine("Coach added successfully.");
-    Console.WriteLine("Press any key to continue.");
-    Console.ReadKey();
-}
+            Console.WriteLine("Coach added successfully.");
+            Console.WriteLine("Press any key to continue.");
+            Console.ReadKey();
+        }
 
-
-
-
-        public static void DeleteCoach(Administrator administrator)
+        public static void DeleteCoach()
         {
             Console.Clear();
             Console.WriteLine("Deleting a coach:");
 
-            // Laat eerst de lijst met coaches zien om te kiezen welke coach te verwijderen
             Console.WriteLine("Select the coach to delete:");
 
             List<Person> persons = Person.GetPersons();
@@ -171,7 +173,7 @@ public static void AddCoach(Administrator administrator)
             Console.ReadKey();
         }
 
-        public static void UpdateCoach(Administrator administrator)
+        public static void UpdateCoach()
         {
             static string InputValue(string prompt)
             {
@@ -262,31 +264,8 @@ public static void AddCoach(Administrator administrator)
 
         }
 
-        public static int DisplayMenuOptions(List<string> options, string title = "", Workout workout = null, bool clearConsole = true)
-        {
-            if (clearConsole)
-            {
-                //Console.Clear();
-            }
-            if (title != "")
-            {
-                Console.WriteLine(title);
-                Console.WriteLine();
-            }
-            if (workout != null)
-            {
-                PrintWorkout(workout);
-            }
-            for (int i = 0; i < options.Count; i++)
-            {
-                Console.WriteLine($"{i + 1}. {options[i]}");
-            }
-            Console.WriteLine("");
-            int choice = Convert.ToInt32(Console.ReadLine());
-            return choice;
-        }
 
-
+        /* Athlete menu's */
         public static void AthleteMainMenu(Athlete athlete)
         {
             List<string> options = [
@@ -334,7 +313,7 @@ public static void AddCoach(Administrator administrator)
                 options.Add(workout.Date.ToString("dd/MM/yyyy"));
             }
             int choice = DisplayMenuOptions(options, "Choose a workout to view/edit");
-            
+
             if (choice == 1)
             {
                 AthleteMainMenu(athlete);
@@ -345,7 +324,7 @@ public static void AddCoach(Administrator administrator)
                 AthleteSingleWorkout(athlete, workout);
             }
         }
-        
+
         public static void AthleteCreateWorkout(Athlete athlete)
         {
             List<string> options = [
@@ -454,7 +433,6 @@ public static void AddCoach(Administrator administrator)
             List<string> options = [
                 "Add exercise",
                 "Remove exercise",
-                "To do - Edit exercise",
                 "Delete workout",
                 "Go back",
                 "Main menu",
@@ -478,23 +456,16 @@ public static void AddCoach(Administrator administrator)
             }
             else if (choice == 3)
             {
-                // Edit exercise
-                //List<Exercise> updatedExercises = EditExercises();
-            }
-            else if (choice == 4)
-            {
                 // Delete workout
-                // To do - delete workout
-                //AthleteViewWorkouts(athlete);
                 workout.DeleteWorkout();
                 AthleteViewWorkouts(athlete);
             }
-            else if (choice == 5)
+            else if (choice == 4)
             {
                 // Previous menu
                 AthleteViewWorkouts(athlete);
             }
-            else if (choice == 6)
+            else if (choice == 5)
             {
                 // Main menu
                 AthleteMainMenu(athlete);
@@ -519,15 +490,13 @@ public static void AddCoach(Administrator administrator)
                 {
                     Console.WriteLine("Add set? (y/n)");
                     string newSetBool = Console.ReadLine();
-                    if (newSetBool == "y") 
+                    if (newSetBool == "y")
                     {
                         Console.Write("Weight: (in Kg)");
                         double weight = Convert.ToDouble(Console.ReadLine());
                         Console.Write("Reps: ");
                         int reps = Convert.ToInt32(Console.ReadLine());
                         Sets set = new Sets(0, reps, weight);
-                        //Sets newSet = set.CreateSet();
-                        //newSet = newSet.CreateSet();
                         sets.Add(set);
                     }
                     else
@@ -568,340 +537,175 @@ public static void AddCoach(Administrator administrator)
             }
             else
             {
-                Exercise exerciseToRemove = exercises[choice -2];
+                Exercise exerciseToRemove = exercises[choice - 2];
                 exerciseToRemove.DeleteExercise();
                 exercises.RemoveAt(choice - 2);
                 return exercises;
             }
         }
 
-        //public static void AthleteWorkoutAddExercise(Workout workout, Athlete athlete)
-        //{
-        //    Console.Write("Exercise name: ");
-        //    string exerciseName = Console.ReadLine();
-        //    Console.Write("Exercise type (strength or cardio): ");
-        //    string exerciseType = Console.ReadLine();
-        //    List<Sets> sets = new List<Sets>();
-        //    if (exerciseType == "strength")
-        //    {
-        //        bool addSetsFlag = true;
-        //        while (addSetsFlag)
-        //        {
-        //            Console.WriteLine("Add set? (y/n)");
-        //            string newSetBool = Console.ReadLine();
-        //            if (newSetBool == "y")
-        //            {
-        //                Console.Write("Weight: (in Kg)");
-        //                double weight = Convert.ToDouble(Console.ReadLine());
-        //                Console.Write("Reps: ");
-        //                int reps = Convert.ToInt32(Console.ReadLine());
-        //                Sets set = new Sets(0, reps, weight);
-        //                Sets newSet = set.CreateSet();
-        //                newSet = newSet.CreateSet();
-        //                sets.Add(newSet);
-        //            }
-        //            else
-        //            {
-        //                addSetsFlag = false;
-        //            }
-        //        }
 
-        //        Strength newExercise = new Strength(0, exerciseName, sets);
-        //        newExercise.CreateExercise(workout, newExercise);
-        //        workout.Exercises.Add(newExercise);
-        //        AthleteCreateWorkout(athlete, workout);
-        //    }
-        //    else if (exerciseType == "cardio")
-        //    {
-        //        // To do cardio
-        //    }
-        //}
+        /* Coach Menu's */
+        static void CoachMainMenu(Coach coach)
+        {
+            bool continueMenu = true;
+            while (continueMenu)
+            {
+                Console.Clear();
+                List<string> options = new List<string> {
+                    "Add Athlete",
+                    "Show Athlete Progression",
+                    "Add Activity for athlete",
+                    "Give Athlete Feedback",
+                    "Read Athlete Feedback",
+                    "Exit"
+                };
+                int choice = DisplayMenuOptions(options, "Coach Menu");
 
-        //public static void AthleteCreateExercise(Workout workout, Athlete athlete)
-        //{
-        //    Console.Write("Exercise name: ");
-        //    string exerciseName = Console.ReadLine();
-        //    Console.Write("Exercise type (strength or cardio): ");
-        //    string exerciseType = Console.ReadLine();
-        //    List<Sets> sets = new List<Sets>();
-        //    if (exerciseType == "strength")
-        //    {
-        //        bool addSetsFlag = true;
-        //        while (addSetsFlag) {
-        //            Console.WriteLine("Add set? (y/n)");
-        //            string newSetBool = Console.ReadLine();
-        //            if (newSetBool == "y")
-        //            {
-        //                Console.Write("Weight: (in Kg)");
-        //                double weight = Convert.ToDouble(Console.ReadLine());
-        //                Console.Write("Reps: ");
-        //                int reps = Convert.ToInt32(Console.ReadLine());
-        //                Sets set = new Sets(0, reps, weight);
-        //                Sets newSet = set.CreateSet();
-        //                newSet = newSet.CreateSet();
-        //                sets.Add(newSet);
-        //            }
-        //            else
-        //            {
-        //                addSetsFlag = false;
-        //            }
-        //        }
+                switch (choice)
+                {
+                    case 1:
+                        Createperson();
+                        break;
+                    case 2:
+                        SeeAthleteProgression();
+                        break;
+                    case 3:
+                        CreateActivity();
+                        break;
+                    case 4:
+                        CreateFeedback();
+                        break;
+                    case 5:
+                        ReadAllFeedback();
+                        break;
+                    case 6:
+                        continueMenu = false;
+                        break;
+                    default:
+                        Console.WriteLine("Invalid choice. Please try again.");
+                        break;
+                }
+            }
+        }
 
-        //        Strength newExercise = new Strength(0, exerciseName, sets);
-        //        newExercise.CreateExercise(workout, newExercise);
-        //        workout.Exercises.Add(newExercise);
-        //        AthleteCreateWorkout(athlete, workout);
-        //    } else if (exerciseType == "cardio")
-        //    {
-        //        // To do cardio
-        //    }
-        //}
+        public static void Createperson()
+        {
+            Console.Clear();
+            Console.WriteLine("Adding a new person:");
 
-        // static void AthleteWorkoutRemoveExercise(Workout workout, Athlete athlete)
-        // {
-        //    List<string> options = [
-        //        "Go back",
-        //        "Main menu",
-        //    ];
-        //    foreach (Exercise exercise in workout.Exercises)
-        //    {
-        //        options.Add(exercise.Name);
-        //    }
-        //    int choice = DisplayMenuOptions(options, "Choose wich exercise you'd like to remove");
-
-        //    if (choice == 1)
-        //    {
-        //        AthleteCreateWorkout(athlete, workout);
-        //    }
-        //    if (choice == 2)
-        //    {
-        //        AthleteMainMenu(athlete);
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine("Invalid choice");
-        //    }
-        //}
-
-        //public static void AthleteWorkoutEditExercise(Workout workout, Athlete athlete)
-        //{
-        //    List<string> options = [
-        //        //"Add set",
-        //        //"Remove exercise",
-        //        //"Edit exercise",
-        //        "Go back",
-        //        "Main menu",
-        //    ];
-        //    int choice = DisplayMenuOptions(options, "Edit workout exercise");
-
-        //    if (choice == 1)
-        //    {
-        //        //AthleteWorkoutAddExercise(workout, athlete);
-        //    }
-        //    //else if (choice == 2)
-        //    //{
-        //    //    AthleteWorkoutRemoveExercise(workout, athlete);
-        //    //}
-        //    else
-        //    {
-        //        Console.WriteLine("Invalid choice");
-        //    }
-        //}
-
-        //public static void AthleteSingleWorkoutMenu(Workout workout, Athlete athlete)
-        //{
-        //    List<string> options = [
-        //        "To do - Add exercise",
-        //        "Edit exercise",
-        //        "To do - Remove exercise",
-        //        "Go back",
-        //        "Main menu",
-        //    ];
-        //    int choice = DisplayMenuOptions(options, "View workout", workout);
-
-        //    if (choice == 1)
-        //    {
-        //    }
-        //    else if (choice== 2)
-        //    {
-        //        AthleteWorkoutEditExercise(workout, athlete);
-        //    }
-        //    else if (choice == 4)
-        //    {
-        //        AthleteViewWorkouts(athlete);
-        //    }
-        //    else if (choice == 5)
-        //    {
-        //        AthleteMainMenu(athlete);
-
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine("Invalid choice");
-        //    }
-        //}
+            // Verzamel de gegevens van de nieuwe persoon
+            Console.Write("Enter first name: ");
+            string firstName = Console.ReadLine();
+            Console.Write("Enter last name: ");
+            string lastName = Console.ReadLine();
+            Console.Write("Enter street name: ");
+            string streetName = Console.ReadLine();
+            Console.Write("Enter house number: ");
+            string houseNumber = Console.ReadLine();
+            Console.Write("Enter postal code: ");
+            string postalCode = Console.ReadLine();
 
 
-        //public static void AthleteViewWorkout(Workout workout, Athlete athlete)
-        //{
+            List<Feedback> feedback = new List<Feedback>();
+            Location location = new Location(1, "locatie 1", "straatnaam", "huisnummer", "1837jd", []);
 
-        //    //Console.Clear();
-        //    PrintWorkout(workout);
-        //    Console.WriteLine("");
-        //    Console.WriteLine("1. Go back");
-        //    Console.WriteLine("2. Main menu");
+            Person newPerson = new Athlete(1, firstName, lastName, streetName, houseNumber, postalCode, location, feedback);
+            newPerson.CreatePerson();
+            Console.WriteLine("Athlete added succesfully!");
+        }
 
-        //    Console.WriteLine("");
-        //    int choice = Convert.ToInt32(Console.ReadLine());
+        public static void SeeAthleteProgression()
+        {
+            List<Person> persons = Person.GetPersons();
+            foreach (Person person in persons)
+            {
+                if (person is Athlete)
+                {
+                    Console.WriteLine($"Athlete: {person.Id} - {person.FirstName} {person.LastName}");
+                }
+            }
+            Console.WriteLine("Choose a person to view progression:");
+            int id = Convert.ToInt32(Console.ReadLine());
+            if (persons.Find(p => p.Id == id) is Athlete athlete)
+            {
+                List<string> options = [
+                "Go back",
+            ];
+                int[] data = { 5, 6, 8, 10, 11, 11, 8, 9, 12, 15 }; // Sample data
 
-        //    if (choice == 1)
-        //    {
-        //        // Previous menu
-        //        AthleteSingleWorkoutMenu(workout, athlete);
-        //    }
-        //    else if (choice == 2)
-        //    {
-        //        // Main menu
-        //        AthleteMainMenu(athlete);
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine("Invalid choice");
-        //    }
-        //}
+                // Find the maximum value in the data
+                int maxValue = 0;
+                foreach (int value in data)
+                {
+                    if (value > maxValue)
+                        maxValue = value;
+                }
 
-        //public static void AthleteEditWorkout(Workout workout, Athlete athlete)
-        //{
-        //    //Console.Clear();
-        //    //PrintWorkout(workout);
-        //    Console.WriteLine("1. Go back");
-        //    Console.WriteLine("2. Main menu");
-        //    int index = 3;
-        //    foreach (Exercise exercise in workout.Exercises)
-        //    {
-        //        Console.WriteLine($"{index}. {exercise.Name}");
-        //        if (exercise is Cardio)
-        //        {
-        //            Cardio cardio = (Cardio)exercise;
-        //            Console.WriteLine($"  Type: Cardio");
-        //            if (cardio.Duration != "")
-        //            {
-        //                Console.WriteLine($"  Duration: {cardio.Duration}");
-        //            }
-        //            if (cardio.Distance != "")
-        //            {
-        //                Console.WriteLine($"  Distance: {cardio.Distance}");
-        //            }
-        //        }
-        //        else if (exercise is Strength)
-        //        {
-        //            Strength strength = (Strength)exercise;
-        //            if (strength.Sets.Count > 0)
-        //            {
-        //                Console.WriteLine("  Sets:");
-        //                foreach (Sets set in strength.Sets)
-        //                {
-        //                    Console.WriteLine($"    - Weight: {set.Weight} Reps: {set.Reps}");
-        //                }
-        //            }
-        //        }
-        //        index++;
-        //    }
+                // Draw the graph
+                Console.WriteLine("   ^");
+                Console.WriteLine("   |");
+                Console.WriteLine("   |");
+                for (int i = maxValue; i > 0; i--)
+                {
+                    Console.Write($"   |");
+                    foreach (int value in data)
+                    {
+                        if (value >= i)
+                            Console.Write(" * ");
+                        else
+                            Console.Write("   ");
+                    }
+                    Console.WriteLine();
+                }
 
-        //    Console.WriteLine("");
-        //    int choice = Convert.ToInt32(Console.ReadLine());
-
-        //    if (choice == 1)
-        //    {
-        //        // Previous menu
-        //        AthleteSingleWorkoutMenu(workout, athlete);
-        //    }
-        //    else if (choice == 2)
-        //    {
-        //        // Main menu
-        //        AthleteMainMenu(athlete);
-        //    }
-        //    else
-        //    {
-        //        Exercise exercise = workout.Exercises[choice - 3];
-        //        AthleteEditExercise(workout, exercise, athlete);
-        //    }
-        //}
+                // Print the x-axis labels
+                Console.Write("   +");
+                for (int i = 0; i < data.Length * 3; i++)
+                {
+                    Console.Write("-");
+                }
+                Console.WriteLine(">");
+            }
+            else
+            {
+                Console.WriteLine("Invalid choice");
+            }
 
 
-        //public static void AthleteEditExercise(Workout workout, Exercise exercise, Athlete athlete)
-        //{
-        //    //Console.Clear();
+            //int choice = DisplayMenuOptions(options, "View your progression", null, false);
 
-        //    Console.WriteLine($"Edit {exercise.Name}");
-        //    Console.WriteLine("");
-        //    Console.WriteLine("1. Go back");
-        //    Console.WriteLine("2. Main menu");
-        //    Console.WriteLine("3. Add set");
-        //    Console.WriteLine("4. Remove set");
-        //    if (exercise is Cardio)
-        //    {
-        //        // To do - Show cardio exercise
-        //    }
-        //    else if (exercise is Strength)
-        //    {
-        //        Strength strength = (Strength)exercise;
-        //        int index = 5;
-        //        foreach (Sets set in strength.Sets)
-        //        {
-        //            Console.WriteLine($"{index} - Weight: {set.Weight} Reps: {set.Reps}");
-        //            index++;
-        //        }
-        //    }
+            //if (choice == 1)
+            //{
+            //    AthleteMainMenu(athlete);
+            //}
+            //else
+            //{
+            //    Console.WriteLine("Invalid choice");
+            //}
+        }
 
-        //    Console.WriteLine("");
-        //    int choice = Convert.ToInt32(Console.ReadLine());
+        public static void CreateActivity()
+        {
+            Console.Clear();
+            Console.WriteLine("Adding a new activity:");
 
-        //    if (choice == 1)
-        //    {
-        //        // Previous menu
-        //        AthleteEditWorkout(workout, athlete);
-        //    }
-        //    else if (choice == 2)
-        //    {
-        //        // Main menu
-        //        AthleteMainMenu(athlete);
-        //    }
-        //    else
-        //    {
-        //        if (exercise is Strength)
-        //        {
-        //            Strength strength = (Strength)exercise;
-        //            AthleteEditSet(workout, exercise, strength.Sets[choice - 5], athlete);
-        //        }
-        //        else if (exercise is Cardio)
-        //        {
-        //            // To do - Edit cardio
-        //        }
-        //    }
-        //}
+            // Vraag de gebruiker om de gegevens van de nieuwe activiteit in te voeren
+            Console.Write("Enter activity name: ");
+            string name = Console.ReadLine();
+            Console.Write("Enter activity duration: ");
+            string duration = Console.ReadLine();
 
-        //public static void AthleteEditSet(Workout workout, Exercise exercise, Sets set, Athlete athlete)
-        //{
-        //    //Console.Clear();
+            List<Activity> activities = new List<Activity>();
+            List<Athlete> athlete = new List<Athlete>();
+            Activity newActivity = new Activity(1, name, duration, athlete);
+            newActivity.CreateActivity();
+            Console.WriteLine("Activity Created Succesfully!");
 
-        //    Console.WriteLine($"Editing {exercise.Name}");
-        //    Console.WriteLine("");
-
-        //    Console.Write("Weight: ");
-        //    string weight = Console.ReadLine();
-        //    Console.Write("Reps: ");
-        //    int reps = Convert.ToInt32(Console.ReadLine());
-
-        //    // To do - Update set
-        //    AthleteEditExercise(workout, exercise, athlete);
-
-        //}
+        }
 
 
-
-
-
+        /* Print Method's */
         public static void PrintWorkouts(List<Workout> workouts)
         {
             foreach (Workout workout in workouts)
@@ -949,9 +753,59 @@ public static void AddCoach(Administrator administrator)
             }
         }
 
+        public static int DisplayMenuOptions(List<string> options, string title = "", Workout workout = null, bool clearConsole = true)
+        {
+            if (clearConsole)
+            {
+                Console.Clear();
+            }
+            if (title != "")
+            {
+                Console.WriteLine(title);
+                Console.WriteLine();
+            }
+            if (workout != null)
+            {
+                PrintWorkout(workout);
+            }
+            for (int i = 0; i < options.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {options[i]}");
+            }
+            Console.WriteLine("");
+            int choice = Convert.ToInt32(Console.ReadLine());
+            return choice;
+        }
+        public static void CreateFeedback()
+        {
+            Console.Clear();
+            Console.WriteLine("Adding a new feedback:");
+
+            // Vraag de gebruiker om de gegevens van de nieuwe feedback in te voeren
+            Console.Write("Enter feedback message: ");
+            string message = Console.ReadLine();
+
+
+
+            List<Feedback> feedbacks = new List<Feedback>();
+            Feedback newFeedback = new Feedback(1, message, DateTime.Now);
+            newFeedback.CreateFeedback(newFeedback);
+            Console.WriteLine("Feedback Created Succesfully!");
+
+        }
+
+        public static void ReadAllFeedback()
+        {
+            List<Feedback> feedbacks = Feedback.ReadAllFeedback();
+            foreach (Feedback feedback in feedbacks)
+            {
+                Console.WriteLine($"Feedback: {feedback.Id} - {feedback.FeedbackMessage} - {feedback.Date}");
+            }
+            Console.WriteLine("Press any key to go back.");
+            Console.ReadKey();
+        }
     }
 }
-
 
 
 
