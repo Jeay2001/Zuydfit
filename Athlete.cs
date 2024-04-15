@@ -28,5 +28,11 @@ namespace Zuydfit
             Location = location;
             Feedbacks = feedbacks;
         }
+
+        public Athlete(int id, string firstName, string lastName, string streetName, string houseNumber, string postalcode, Location location)
+            : base(id, firstName, lastName, streetName, houseNumber, postalcode)
+        {
+            Location = location;
+        }
     }
 }
