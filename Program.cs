@@ -14,6 +14,7 @@ namespace Zuydfit
         {
             Console.WriteLine("Welkom bij Zuydfit!");
 
+
             Location location = new Location(1, "locatie 1", "straatnaam", "huisnummer", "1837jd", []);
             List<Feedback> feedbacks = new List<Feedback>();
 
@@ -24,6 +25,16 @@ namespace Zuydfit
             while (true) // Oneindige lus om de console open te houden
             {
                 MainMenu(athlete, coach, administrator);
+            }
+        }
+
+
+            bool flag = true;
+            while (flag)
+            {
+                Console.WriteLine("");
+                MainMenu(athlete, coach, administrator);
+                flag = false;
             }
         }
 
