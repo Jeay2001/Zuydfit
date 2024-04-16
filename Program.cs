@@ -306,7 +306,13 @@ namespace Zuydfit
             else if (exerciseType == "cardio")
             {
                 // To do - cardio
-                Cardio newExercise = new Cardio(0, "test", "10 min", "500m");
+                Console.Write("Exercise duration (leave empty if needed): ");
+                string duration = Console.ReadLine();
+                Console.Write("Exercise distance (leave empty if needed): ");
+                string distance = Console.ReadLine();
+
+                Cardio newExercise = new Cardio(0, exerciseName, duration, distance);
+                newExercise.CreateExercise(workout, newExercise);
                 return newExercise;
             }
             // To do - exercise type controleren
@@ -343,14 +349,12 @@ namespace Zuydfit
         static void CoachMainMenu()
         {
             List<string> options = new List<string> {
-                // We maken een atleet maar doen er niks mee
-                "To do - Create Athlete",
+                "Create Athlete",
                 "Show Athlete Progression",
                 "View all activities",
                 "Create activity",
-                "To do - Read Athlete Feedback",
+                "Read Athlete Feedback",
                 "To do - Give Athlete Feedback",
-                "Exit"
             };
 
             int choice = DisplayMenuOptions(options, "Coach Menu");
@@ -575,34 +579,69 @@ namespace Zuydfit
             //    Console.WriteLine("Invalid choice");
             //}
         }
-        
-        public static void CreateFeedback()
-        {
-            Console.Clear();
-            Console.WriteLine("Adding a new feedback:");
-
-            // Vraag de gebruiker om de gegevens van de nieuwe feedback in te voeren
-            Console.Write("Enter feedback message: ");
-            string message = Console.ReadLine();
-
-
-
-            List<Feedback> feedbacks = new List<Feedback>();
-            Feedback newFeedback = new Feedback(1, message, DateTime.Now);
-            newFeedback.CreateFeedback();
-            Console.WriteLine("Feedback Created Succesfully!");
-
-        }
 
         public static void ReadAthleteFeedback()
         {
+            Console.Clear();
+            Console.WriteLine("Choose a person to view progression:");
+
+            List<Person> persons = Person.GetPersons();
+
+            foreach (Person person in persons)
+            {
+                if (person is Athlete)  
+                {
+                    Console.WriteLine($"Athlete: {person.Id} - {person.FirstName} {person.LastName}");
+                }
+            }
+
+            int id = Convert.ToInt32(Console.ReadLine());
+
+            Console.Clear();
+            if (persons.Find(p => p.Id == id) is Athlete athlete)
+            {
+                Console.WriteLine($"Feedback van {athlete.FirstName} {athlete.LastName}:");
+                Console.WriteLine("");
+            }
+            
             List<Feedback> feedbacks = Feedback.ReadAllFeedback();
             foreach (Feedback feedback in feedbacks)
             {
                 Console.WriteLine($"Feedback: {feedback.Id} - {feedback.FeedbackMessage} - {feedback.Date}");
             }
+
+            Console.WriteLine("");
             Console.WriteLine("Press any key to go back.");
             Console.ReadKey();
+
+            CoachMainMenu();
+        }
+        
+        public static void CreateFeedback()
+        {
+            Console.Clear();
+            Console.WriteLine("Choose a person to give them feedback:");
+
+            List<Person> persons = Person.GetPersons();
+
+            foreach (Person person in persons)
+            {
+                if (person is Athlete)
+                {
+                    Console.WriteLine($"Athlete: {person.Id} - {person.FirstName} {person.LastName}");
+                }
+            }
+
+            int athleteId = Convert.ToInt32(Console.ReadLine());
+
+            Console.Write("Enter feedback message: ");
+            string message = Console.ReadLine();
+
+            // To do - create feedback in PersonFeedback table in database
+            Feedback newFeedback = new Feedback(1, message, DateTime.Now);
+            newFeedback.CreateFeedback();
+            Console.WriteLine("Feedback Created Succesfully!");
+
         }
 
 
