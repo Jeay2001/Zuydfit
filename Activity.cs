@@ -11,6 +11,14 @@ namespace Zuydfit
         public string Duration { get; set; }
         public List<Athlete> Athletes { get; set; }
 
+        public Activity(int id, string name, string duration)
+        {
+            Id = id;
+            Name = name;
+            Duration = duration;
+            Athletes = new List<Athlete>();
+        }
+
         public Activity(int id, string name, string duration, List<Athlete> athletes)
         {
             Id = id;
@@ -18,7 +26,7 @@ namespace Zuydfit
             Duration = duration;
             Athletes = athletes;
         }
-        // Lege constructor voor het maken van nieuwe instanties zonder ID
+
         public Activity(string name, string duration, List<Athlete> athletes)
         {
             Name = name;
@@ -51,6 +59,13 @@ namespace Zuydfit
         {
             DAL dal = new DAL();
             dal.DeleteActivity(this);
+        }
+
+        public static List<Activity> ReadAllActivities()
+        {
+            DAL dal = new DAL();
+            List<Activity> returnedActivities = dal.ReadAllActivities();
+            return returnedActivities;
         }
     }
 }
