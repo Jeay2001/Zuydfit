@@ -22,6 +22,11 @@ namespace Zuydfit
             Coach coach = new Coach(1, "zuch", "mabaulz", "zweetweg", "69", "4200", []);
             Administrator administrator = new Administrator(1, "karel", "kerel", "hebikniet", "66", "9999", []);
 
+            while (true) // Oneindige lus om de console open te houden
+            {
+                MainMenu(athlete, coach, administrator);
+            }
+        }
 
 
             bool flag = true;
