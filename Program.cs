@@ -414,24 +414,37 @@ namespace Zuydfit
             Console.Clear();
             Console.WriteLine("Machines at Location:");
 
-            if (administrator.Locations.Count > 0)
-            {
-                List<Machine> machines = administrator.Locations[0].Machines;
+            // Haal alle MachineLocations op
+            List<MachineLocation> machineLocations = dal.ReadMachineLocation();
 
-                foreach (Machine machine in machines)
+            if (machineLocations.Count > 0)
+            {
+                foreach (MachineLocation machineLocation in machineLocations)
                 {
-                    Console.WriteLine($"Machine ID: {machine.Id}, Name: {machine.Name}");
+                    // Zoek de locatie op basis van de locatie-ID van de huidige MachineLocation
+                    Location location = new Location().ReadLocation(machineLocation.LocationID);
+
+                    // Controleer of de locatie van de huidige MachineLocation aan de beheerder is toegewezen
+                    if (administrator.Locations.Any(l => l.Id == location.Id))
+                    {
+                        // Zoek de machine op basis van de machine-ID van de huidige MachineLocation
+                        Machine machine = new Machine().ReadMachine(machineLocation.MachineID);
+
+                        // Toon de machinegegevens
+                        Console.WriteLine($"Location: {location.Name}, Machine ID: {machine.Id}, Name: {machine.Name}");
+                    }
                 }
             }
             else
             {
-                Console.WriteLine("No locations found.");
+                Console.WriteLine("No machine locations found.");
             }
 
             Console.WriteLine("Press any key to go back.");
             Console.ReadKey();
             AdministratorMainMenu(administrator);
         }
+    
 
         /* Helper Functions */
 

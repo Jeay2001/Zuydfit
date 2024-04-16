@@ -596,14 +596,14 @@ namespace Zuydfit.DataAccessLayer
         }
 
 
-        public List<Machine> ReadMachineLocation()
+        public List<MachineLocation> ReadMachineLocation()
         {
-            List<Machine> machines = new List<Machine>();
+            List<MachineLocation> machineLocations = new List<MachineLocation>();
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string sql = "SELECT * FROM MachineLocation";
+                string sql = "SELECT MachineID, LocationID FROM MachineLocation";
                 SqlCommand command = new SqlCommand(sql, connection);
 
                 using (SqlDataReader reader = command.ExecuteReader())
@@ -612,16 +612,15 @@ namespace Zuydfit.DataAccessLayer
                     {
                         int machineId = reader.GetInt32(0);
                         int locationId = reader.GetInt32(1);
-                        // Hier kun je de machines bijwerken met de locatiegegevens
-                        // door de bijbehorende machine op te halen en de locatie toe te voegen
-                        Machine machine = ReadMachine(machineId); // Lees de machinegegevens uit de database op basis van de machine-ID
-                        machine.Location = ReadLocation(locationId); // Lees de locatiegegevens uit de database op basis van de locatie-ID
-                        machines.Add(machine); // Voeg de bijgewerkte machine toe aan de lijst
+
+                        // Maak een nieuwe instantie van MachineLocation en voeg deze toe aan de lijst
+                        MachineLocation machineLocation = new MachineLocation(machineId, locationId);
+                        machineLocations.Add(machineLocation);
                     }
                 }
             }
 
-            return machines;
+            return machineLocations;
         }
 
         public bool DeleteMachine(Machine machine)
@@ -648,7 +647,7 @@ namespace Zuydfit.DataAccessLayer
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string sql = "SELECT Id, Name, Streetname, Housenumber, Postalcode FROM Location"; // Verwijderd WHERE Id = @locationId
+                string sql = "SELECT Id, Name, StreetName, HouseNumber, PostalCode FROM Location";
                 SqlCommand command = new SqlCommand(sql, connection);
 
                 using (SqlDataReader reader = command.ExecuteReader())
@@ -667,33 +666,38 @@ namespace Zuydfit.DataAccessLayer
             }
 
             return locations;
+        
+    
+
         }
 
-        public Location ReadLocation(Location location)
+        public Location ReadLocation(int locationId)
         {
-            Location newLocation = null;
+            Location location = null;
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string sql = "INSERT INTO Location (Name, Streetname, Housenumber, Postalcode) VALUES (@Name, @Streetname, @Housenumber, @Postalcode); SELECT SCOPE_IDENTITY();";
+                string sql = "SELECT Id, Name, StreetName, HouseNumber, PostalCode FROM Location WHERE Id = @LocationId";
                 SqlCommand command = new SqlCommand(sql, connection);
-                command.Parameters.AddWithValue("@Name", location.Name);
-                command.Parameters.AddWithValue("@Streetname", location.StreetName);
-                command.Parameters.AddWithValue("@Housenumber", location.HouseNumber);
-                command.Parameters.AddWithValue("@Postalcode", location.PostalCode);
-                command.Parameters.AddWithValue("@locationId", location);
+                command.Parameters.AddWithValue("@LocationId", locationId);
 
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
                     if (reader.Read())
                     {
-                        newLocation = new Location(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetString(4));
+                        location = new Location(
+                            reader.GetInt32(0),
+                            reader.GetString(1),
+                            reader.GetString(2),
+                            reader.GetString(3),
+                            reader.GetString(4)
+                        );
                     }
                 }
             }
 
-            return newLocation;
+            return location;
         }
 
         public Location CreateLocation(Location location)

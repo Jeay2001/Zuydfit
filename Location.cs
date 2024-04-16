@@ -44,12 +44,13 @@ namespace Zuydfit
             return locations;
         }
 
-        public Location ReadLocation(Location location)
+        public Location ReadLocation(int locationId)
         {
-            DAL dal = new();
-            Location returnedLocation = dal.ReadLocation(location);
+            DAL dal = new DAL();
+            Location returnedLocation = dal.ReadLocation(locationId);
             return returnedLocation;
         }
+
 
         public Location CreateLocation(Location location)
         {
