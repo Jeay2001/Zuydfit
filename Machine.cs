@@ -22,11 +22,18 @@ namespace Zuydfit
         public Machine()
         {
         }
-
-        public void UpdateMachineLocation()
+        public static List<Machine> ReadMachineLocation()
         {
             DAL dal = new DAL();
-            dal.UpdateMachineLocation(this);
+            List<Machine> machinelocation = dal.ReadMachineLocation();
+            return machinelocation;
+              
+        }
+
+        public static void UpdateMachineLocation(Machine machine, Location location)
+        {
+            DAL dal = new DAL();
+            dal.UpdateMachineLocation(machine, location);
         }
 
         public static List<Machine> ReadMachines()
@@ -50,11 +57,10 @@ namespace Zuydfit
             return createdMachine;
         }
 
-        public Machine UpdateMachine(Machine machine)
+        public void UpdateMachine()
         {
             DAL dal = new DAL();
-            Machine updatedMachine = dal.UpdateMachine(machine);
-            return updatedMachine;
+            dal.UpdateMachine(this);
         }
 
         public bool DeleteMachine(Machine machine)

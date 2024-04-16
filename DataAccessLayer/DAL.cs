@@ -546,20 +546,82 @@ namespace Zuydfit.DataAccessLayer
             return machine;
         }
 
-        public Machine UpdateMachineLocation(Machine machine) 
+        public Machine UpdateMachineLocation(Machine machine, Location location)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            try
             {
-                connection.Open();
-                string sql = "UPDATE MachineLocation SET LocationId = @LocationId WHERE Id = @Id";
-                SqlCommand command = new SqlCommand(sql, connection);
-                command.Parameters.AddWithValue("@Id", machine.Id);
-                command.Parameters.AddWithValue("@LocationId", machine.Location.Id);
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string sql = "UPDATE MachineLocation SET LocationID = @LocationID WHERE MachineID = @MachineID";
+                    SqlCommand command = new SqlCommand(sql, connection);
+                    command.Parameters.AddWithValue("@MachineID", machine.Id);
+                    command.Parameters.AddWithValue("@LocationID", location.Id);
 
-                command.ExecuteNonQuery();
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error occurred: ");
+                Console.WriteLine(ex);
             }
 
             return machine;
+        }
+
+        public bool DeleteMachineFromLocation(Machine machine, Location location)
+        {
+            int rowsAffected = 0;
+            try
+            {
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string sql = "DELETE FROM MachineLocation WHERE MachineID = @MachineID AND LocationID = @LocationID";
+                    SqlCommand command = new SqlCommand(sql, connection);
+                    command.Parameters.AddWithValue("@MachineID", machine.Id);
+                    command.Parameters.AddWithValue("@LocationID", location.Id);
+
+                    rowsAffected = command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error occurred: ");
+                Console.WriteLine(ex);
+            }
+
+            return rowsAffected > 0;
+        }
+
+
+        public List<Machine> ReadMachineLocation()
+        {
+            List<Machine> machines = new List<Machine>();
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = "SELECT * FROM MachineLocation";
+                SqlCommand command = new SqlCommand(sql, connection);
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        int machineId = reader.GetInt32(0);
+                        int locationId = reader.GetInt32(1);
+                        // Hier kun je de machines bijwerken met de locatiegegevens
+                        // door de bijbehorende machine op te halen en de locatie toe te voegen
+                        Machine machine = ReadMachine(machineId); // Lees de machinegegevens uit de database op basis van de machine-ID
+                        machine.Location = ReadLocation(locationId); // Lees de locatiegegevens uit de database op basis van de locatie-ID
+                        machines.Add(machine); // Voeg de bijgewerkte machine toe aan de lijst
+                    }
+                }
+            }
+
+            return machines;
         }
 
         public bool DeleteMachine(Machine machine)
@@ -1124,4 +1186,5 @@ namespace Zuydfit.DataAccessLayer
             return rowsAffected > 0;
         }
     }
+
 }

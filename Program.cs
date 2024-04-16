@@ -22,21 +22,23 @@ namespace Zuydfit
             Coach coach = new Coach(1, "zuch", "mabaulz", "zweetweg", "69", "4200", []);
             Administrator administrator = new Administrator(1, "karel", "kerel", "hebikniet", "66", "9999", []);
 
-            while (true) // Oneindige lus om de console open te houden
-            {
-                MainMenu(athlete, coach, administrator);
-            }
-        }
+            //while (true) // Oneindige lus om de console open te houden
+            //{
+            //    MainMenu(athlete, coach, administrator);
 
 
-            bool flag = true;
+
+
+                bool flag = true;
             while (flag)
-            {
+            { 
+            
                 Console.WriteLine("");
                 MainMenu(athlete, coach, administrator);
                 flag = false;
             }
         }
+         
 
 
         /* Main Menu */
@@ -62,31 +64,48 @@ namespace Zuydfit
             }
         }
 
+
         /* Administrator menu's */
 
-        static void AdministratorMainMenu(Administrator administrator)
+        public static void AdministratorMainMenu(Administrator administrator)
         {
             List<string> options = new List<string> {
                 "View coaches",
                 "Add coach",
                 "Delete coach",
-                "Update coach"
+                "Update coach",
+                "View Machines at Location",
+                "Add Machine to Location",
+                "Update Machine at Location",
+                "Delete Machine from Location"
             };
             int choice = DisplayMenuOptions(options, "Administrator Menu");
 
             switch (choice)
             {
                 case 1:
-                    ViewCoaches();
+                    ViewCoaches(administrator);
                     break;
                 case 2:
-                    AddCoach();
+                    AddCoach(administrator);
                     break;
                 case 3:
-                    DeleteCoach();
+                    DeleteCoach(administrator);
                     break;
                 case 4:
-                    UpdateCoach();
+                    UpdateCoach(administrator);
+                    break;
+                case 5:
+                    ViewMachinesAtLocation(administrator);
+                    break;
+                case 6:
+                    AddMachineToLocation(administrator);
+                    break;
+                case 7:
+                    UpdateMachineAtLocation(administrator);
+                    break;
+                //case 8:
+                //    DeleteMachineFromLocation(administrator);
                     break;
                 default:
                     Console.WriteLine("Invalid choice");
@@ -94,7 +113,7 @@ namespace Zuydfit
             }
         }
 
-        public static void ViewCoaches()
+        public static void ViewCoaches(Administrator administrator)
         {
 
             Console.Clear();
@@ -111,9 +130,11 @@ namespace Zuydfit
 
             Console.WriteLine("Press any key to go back.");
             Console.ReadKey();
+            AdministratorMainMenu(administrator);
+
         }
 
-        public static void AddCoach()
+        public static void AddCoach(Administrator administrator)
         {
             Console.Clear();
             Console.WriteLine("Adding a new coach:");
@@ -141,9 +162,10 @@ namespace Zuydfit
             Console.WriteLine("Coach added successfully.");
             Console.WriteLine("Press any key to continue.");
             Console.ReadKey();
+            AdministratorMainMenu(administrator);
         }
 
-        public static void DeleteCoach()
+        public static void DeleteCoach(Administrator administrator)
         {
             Console.Clear();
             Console.WriteLine("Deleting a coach:");
@@ -176,9 +198,10 @@ namespace Zuydfit
             Console.WriteLine("Coach deleted successfully.");
             Console.WriteLine("Press any key to continue.");
             Console.ReadKey();
+            AdministratorMainMenu(administrator);
         }
 
-        public static void UpdateCoach()
+        public static void UpdateCoach(Administrator administrator)
         {
             static string InputValue(string prompt)
             {
@@ -264,14 +287,173 @@ namespace Zuydfit
                 personToUpdate.UpdatePerson();
                 Console.WriteLine("Person updated successfully!");
                 Console.WriteLine("==============");
-
+                AdministratorMainMenu(administrator);
             }
+            }
+        public static void AddMachineToLocation(Administrator administrator)
+        {
+            Console.Clear();
+            Console.WriteLine("Adding a new machine to location:");
 
+            // Vraag de gebruiker om de gegevens van de nieuwe machine in te voeren
+            Console.Write("Enter machine ID: ");
+            int machineId = Convert.ToInt32(Console.ReadLine());
+            Console.Write("Enter machine name: ");
+            string machineName = Console.ReadLine();
+
+            // Creëer een nieuw Machine-object met de ingevoerde gegevens
+            Machine newMachine = new Machine(machineId, machineName);
+
+            // Voeg de nieuwe machine toe aan de lijst van machines van de locatie
+            administrator.Locations[0].Machines.Add(newMachine);
+
+            // Roep de DAL-methode aan om de nieuwe machine toe te voegen aan de database
+            DAL dal = new DAL();
+            dal.CreateMachine(newMachine);
+
+            Console.WriteLine("Machine added successfully.");
+            Console.WriteLine("Press any key to continue.");
+            Console.ReadKey();
+            AdministratorMainMenu(administrator);
         }
 
+        public static void UpdateMachineAtLocation(Administrator administrator)
+        {
+            Console.Clear();
+            Console.WriteLine("Updating a machine's location:");
 
-        /* Athlete menu's */
-        public static void AthleteMainMenu(Athlete athlete)
+            // Eerst moeten we een machine selecteren die we willen bijwerken
+            List<Machine> machines = Machine.ReadMachines();
+            Console.WriteLine("Machines: ");
+            foreach (Machine machine in machines)
+            {
+                Console.WriteLine($"MachineId: {machine.Id}, Machine Name: {machine.Name}");
+            }
+            Console.WriteLine("==========================");
+            Console.WriteLine("Choose Id of Machine to Update: ");
+            int machineId = Convert.ToInt32(Console.ReadLine());
+            Machine machineToUpdate = machines.Find(p => p.Id == machineId);
+
+            if (machineToUpdate != null)
+            {
+                Console.Clear();
+                Console.WriteLine("Choose a new location for the machine:");
+                Console.WriteLine("============================");
+
+                List<Location> locations = Location.ReadLocations();
+                Console.WriteLine("Locations: ");
+                foreach (Location location in locations)
+                {
+                    Console.WriteLine($"Location Id: {location.Id}, Location Name: {location.Name}");
+                }
+                Console.WriteLine("============================");
+                Console.WriteLine("Choose location: ");
+                int locationId = Convert.ToInt32(Console.ReadLine());
+                Location newLocation = locations.Find(l => l.Id == locationId);
+
+                if (newLocation != null)
+                {
+                    // Update de locatie van de machine
+                    DAL dal = new DAL();
+                    dal.UpdateMachineLocation(machineToUpdate, newLocation);
+
+                    Console.WriteLine("Machine location updated successfully.");
+                }
+                else
+                {
+                    Console.WriteLine("Location not found.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Machine not found.");
+            }
+
+            Console.WriteLine("Press any key to continue.");
+            Console.ReadKey();
+            AdministratorMainMenu(administrator);
+        }
+
+        public static void DeleteMachineFromLocation(Administrator administrator)
+        {
+            Console.Clear();
+            Console.WriteLine("Deleting a machine from location:");
+
+            // Eerst moeten we een machine selecteren die we willen verwijderen
+            List<Machine> machines = Machine.ReadMachines();
+            Console.WriteLine("Machines: ");
+            foreach (Machine machine in machines)
+            {
+                Console.WriteLine($"MachineId: {machine.Id}, Machine Name: {machine.Name}");
+            }
+            Console.WriteLine("==========================");
+            Console.WriteLine("Choose Id of Machine to Delete: ");
+            int machineId = Convert.ToInt32(Console.ReadLine());
+            Machine machineToDelete = machines.Find(p => p.Id == machineId);
+
+            if (machineToDelete != null)
+            {
+                // Verwijder de machine van de locatie
+                DAL dal = new DAL();
+                dal.DeleteMachineFromLocation(machineToDelete, administrator.Locations[0]);
+
+                Console.WriteLine("Machine deleted from location successfully.");
+            }
+            else
+            {
+                Console.WriteLine("Machine not found.");
+            }
+
+            Console.WriteLine("Press any key to continue.");
+            Console.ReadKey();
+            AdministratorMainMenu(administrator);
+        }
+
+        public static void ViewMachinesAtLocation(Administrator administrator)
+        {
+            Console.Clear();
+            Console.WriteLine("Machines at Location:");
+
+            if (administrator.Locations.Count > 0)
+            {
+                List<Machine> machines = administrator.Locations[0].Machines;
+
+                foreach (Machine machine in machines)
+                {
+                    Console.WriteLine($"Machine ID: {machine.Id}, Name: {machine.Name}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No locations found.");
+            }
+
+            Console.WriteLine("Press any key to go back.");
+            Console.ReadKey();
+            AdministratorMainMenu(administrator);
+        }
+
+        /* Helper Functions */
+
+        static int DisplayMenuOptions(List<string> options, string title)
+            {
+                Console.WriteLine(title);
+                for (int i = 0; i < options.Count; i++)
+                {
+                    Console.WriteLine($"{i + 1}. {options[i]}");
+                }
+                Console.Write("Enter your choice: ");
+                return Convert.ToInt32(Console.ReadLine());
+            }
+
+
+
+
+
+
+
+            /* Athlete menu's */
+            public static void AthleteMainMenu(Athlete athlete)
         {
             List<string> options = [
                 "View workouts",
