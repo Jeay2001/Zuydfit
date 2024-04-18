@@ -15,10 +15,16 @@ namespace Zuydfit
             Console.WriteLine("Welkom bij Zuydfit!");
 
 
-            Location location = new Location(1, "locatie 1", "straatnaam", "huisnummer", "1837jd", []);
+            Location location = new Location(2, "locatie 1", "straatnaam", "huisnummer", "1837jd", []);
             List<Feedback> feedbacks = new List<Feedback>();
 
             Athlete athlete = new Athlete(2, "John", "Doe", "Street", "1", "1234", [], location, feedbacks);
+
+            while (true) // Oneindige lus om de console open te houden
+            {
+                MainMenu(athlete);
+            }
+
 
 
             bool flag = true;
@@ -29,7 +35,7 @@ namespace Zuydfit
                 flag = false;
             }
         }
-
+        
 
         /* Main Menu */
         public static void MainMenu(Athlete athlete)
@@ -898,6 +904,7 @@ namespace Zuydfit
 
         public static int DisplayMenuOptions(List<string> options, string title = "", Workout workout = null, bool clearConsole = true)
         {
+            
             if (clearConsole)
             {
                 Console.Clear();
@@ -916,8 +923,16 @@ namespace Zuydfit
                 Console.WriteLine($"{i + 1}. {options[i]}");
             }
             Console.WriteLine("");
-            int choice = Convert.ToInt32(Console.ReadLine());
-            return choice;
+            try
+            {
+                int choice = Convert.ToInt32(Console.ReadLine());
+                return choice;
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Invalid choice. Please try again.");
+                return DisplayMenuOptions(options, title, workout, clearConsole);
+            }
         }
     }
 }
