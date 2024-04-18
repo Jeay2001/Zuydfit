@@ -20,10 +20,10 @@ namespace Zuydfit
 
             Athlete athlete = new Athlete(2, "John", "Doe", "Street", "1", "1234", [], location, feedbacks);
 
-            while (true) // Oneindige lus om de console open te houden
-            {
-                MainMenu(athlete);
-            }
+            //while (true) // Oneindige lus om de console open te houden
+            //{
+            //    MainMenu(athlete);
+            //}
 
 
 
