@@ -13,6 +13,7 @@ namespace Zuydfit
         public string FeedbackMessage { get; set; }
 
         public DateTime Date { get; set; }
+        public Athlete Athlete { get; set; }
 
         public Feedback(int id, string feedback, DateTime date)
         {
@@ -24,10 +25,16 @@ namespace Zuydfit
 
 
       
-        public Feedback ReadFeedback(Feedback feedback)
+        public static List<Feedback> ReadPersonFeedback(int Id)
         {
             DAL dal = new();
-            Feedback returnedFeedback = dal.ReadFeedback(feedback.Id);
+            List<Feedback> returnedFeedback = dal.ReadFeedback(Id);
+            return returnedFeedback;
+        }
+        public Feedback CreatePersonFeedback(int athletid, int feedbackid)
+        {
+            DAL dal = new();
+            Feedback returnedFeedback = dal.CreatePersonFeedback(athletid, feedbackid);
             return returnedFeedback;
         }
         public static List<Feedback> ReadAllFeedback()
