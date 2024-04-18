@@ -43,7 +43,6 @@ namespace Zuydfit.DataAccessLayer
             return workout;
         }
 
-
         public Exercise CreateExercise(Workout workout, Exercise exercise)
         {
             Console.WriteLine("Creating exercise in database");
@@ -117,7 +116,6 @@ namespace Zuydfit.DataAccessLayer
             }
             return exercise;
         }
-
 
         public bool DeleteExercise(Exercise exercise)
         {
@@ -360,11 +358,6 @@ namespace Zuydfit.DataAccessLayer
             return exercises;
         }
 
-        public Workout UpdateWorkout(Workout workout)
-        {
-
-            return workout;
-        }
 
         
 

@@ -48,13 +48,6 @@ namespace Zuydfit
             return createdWorkout;
         }
 
-        public Workout UpdateWorkout(Workout workout)
-        {
-            DAL dal = new DAL();
-            Workout returnedWorkout = dal.UpdateWorkout(workout);
-            return returnedWorkout;
-        }
-
         public bool DeleteWorkout()
         {
             DAL dal = new DAL();
