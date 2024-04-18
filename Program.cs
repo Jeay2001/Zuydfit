@@ -18,10 +18,7 @@ namespace Zuydfit
             Location location = new Location(1, "locatie 1", "straatnaam", "huisnummer", "1837jd", []);
             List<Feedback> feedbacks = new List<Feedback>();
 
-            Athlete athlete = new Athlete(1, "John", "Doe", "Street", "1", "1234", [], location, feedbacks);
-            Coach coach = new Coach(1, "zuch", "mabaulz", "zweetweg", "69", "4200", []);
-            Administrator administrator = new Administrator(1, "karel", "kerel", "hebikniet", "66", "9999", []);
-
+            Athlete athlete = new Athlete(2, "John", "Doe", "Street", "1", "1234", [], location, feedbacks);
 
 
             bool flag = true;
