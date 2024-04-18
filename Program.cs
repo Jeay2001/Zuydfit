@@ -650,32 +650,81 @@ namespace Zuydfit
         /* Administrator menu's */
         static void AdministratorMainMenu()
         {
-            List<string> options = new List<string> {
-                "View coaches",
-                "Add coach",
-                "Delete coach",
-                "Update coach"
-            };
-            int choice = DisplayMenuOptions(options, "Administrator Menu");
-
-            switch (choice)
+            bool exit = false;
+            while (!exit)
             {
-                case 1:
-                    AdministratorViewCoaches();
-                    break;
-                case 2:
-                    AdministratorCreateCoach();
-                    break;
-                case 3:
-                    AdministratorDeleteCoach();
-                    break;
-                case 4:
-                    AdministratorUpdateCoach();
-                    break;
-                default:
-                    Console.WriteLine("Invalid choice");
-                    break;
+                Console.Clear();
+                List<string> options = new List<string> {
+            "View coaches",
+            "Add coach",
+            "Delete coach",
+            "Update coach",
+            "Show locations",
+            "Read machines", // Nieuwe optie toegevoegd
+            "Exit"
+        };
+                int choice = DisplayMenuOptions(options, "Administrator Menu");
+
+                switch (choice)
+                {
+                    case 1:
+                        AdministratorViewCoaches();
+                        break;
+                    case 2:
+                        AdministratorCreateCoach();
+                        break;
+                    case 3:
+                        AdministratorDeleteCoach();
+                        break;
+                    case 4:
+                        AdministratorUpdateCoach();
+                        break;
+                    case 5:
+                        ReadLocations();
+                        break;
+                    case 6:
+                        ReadMachines();
+                        break;
+                    case 7:
+                        exit = true;
+                        break;
+                    default:
+                        Console.WriteLine("Invalid choice");
+                        Console.WriteLine("Press any key to try again.");
+                        Console.ReadKey();
+                        break;
+                }
             }
+            MainMenu(null); // Ga terug naar het hoofdmenu
+        }
+
+        public static void ReadMachines()
+        {
+            Console.Clear();
+            List<Machine> machines = Machine.ReadMachines();
+            Console.WriteLine("Machines:");
+            foreach (Machine machine in machines)
+            {
+                Console.WriteLine($"Machine ID = {machine.Id} Name = {machine.Name}");
+            }
+
+            Console.WriteLine("\nPress any key to return to the menu...");
+            Console.ReadKey();
+        }
+
+        public static void ReadLocations()
+        {
+            Console.Clear();
+            List<Location> locations = Location.ReadLocations();
+            Console.WriteLine("Locations:");
+            foreach (Location location in locations)
+            { 
+                Console.WriteLine($"Location ID = {location.Id} Name = {location.Name} Street name = {location.StreetName} House number = {location.HouseNumber} Postal code = {location.PostalCode}");
+            }
+
+   
+            Console.WriteLine("\nPress any key to return to the menu...");
+            Console.ReadKey();
         }
 
         public static void AdministratorViewCoaches()
