@@ -12,7 +12,7 @@ namespace Zuydfit
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Welkom bij Zuydfit!");
+            Console.WriteLine("Welcome to Zuydfit!");
 
 
             Location location = new Location(2, "locatie 1", "straatnaam", "huisnummer", "1837jd", []);
