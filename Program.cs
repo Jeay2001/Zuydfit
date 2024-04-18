@@ -40,7 +40,6 @@ namespace Zuydfit
 
 
         /* Main Menu */
-
         public static void MainMenu(Athlete athlete)
         {
             List<string> options = new List<string> {
@@ -87,7 +86,7 @@ namespace Zuydfit
                     break;
                 case 3:
                     // Progression
-                    AthleteProgression(athlete);
+                    CoachAthleteProgression(athlete);
                     break;
                 case 4:
                     // Instructor feedback
@@ -137,7 +136,7 @@ namespace Zuydfit
                 
             if (choice == 1)
             {
-                Exercise newExercise = CreateExercise(workout);
+                Exercise newExercise = AthleteCreateExercise(workout);
                 workout.Exercises.Add(newExercise);
                 AthleteSingleWorkout(athlete, workout);
             }
@@ -155,7 +154,7 @@ namespace Zuydfit
             }
         }
 
-        public static void AthleteProgression(Athlete athlete)
+        public static void CoachAthleteProgression(Athlete athlete)
         {
             List<string> options = [
                 "Go back",
@@ -242,14 +241,14 @@ namespace Zuydfit
             if (choice == 1)
             {
                 // Add exercise
-                Exercise newExercise = CreateExercise(workout);
+                Exercise newExercise = AthleteCreateExercise(workout);
                 workout.Exercises.Add(newExercise);
                 AthleteSingleWorkout(athlete, workout);
             }
             else if (choice == 2)
             {
                 // Remove exercise
-                List<Exercise> exercises = RemoveExerciseFromList(workout.Exercises);
+                List<Exercise> exercises = AthleteRemoveExerciseFromList(workout.Exercises);
                 workout.Exercises = exercises;
                 AthleteSingleWorkout(athlete, workout);
             }
@@ -275,7 +274,7 @@ namespace Zuydfit
             }
         }
 
-        public static Exercise CreateExercise(Workout workout)
+        public static Exercise AthleteCreateExercise(Workout workout)
         {
             Console.Write("Exercise name: ");
             string exerciseName = Console.ReadLine();
@@ -324,7 +323,7 @@ namespace Zuydfit
             return new Strength(0, "test");
         }
 
-        public static List<Exercise> RemoveExerciseFromList(List<Exercise> exercises)
+        public static List<Exercise> AthleteRemoveExerciseFromList(List<Exercise> exercises)
         {
             List<string> options = [
                 "Go back",
@@ -367,22 +366,22 @@ namespace Zuydfit
             switch (choice)
             {
                 case 1:
-                    CreateAthlete();
+                    CoachCreateAthlete();
                     break;
                 case 2:
-                    SeeAthleteProgression();
+                    CoachSeeAthleteProgression();
                     break;
                 case 3:
-                    ViewAllActivities();
+                    CoachViewAllActivities();
                     break;
                 case 4:
-                    CreateActivity();
+                    CoachCreateActivity();
                     break;
                 case 5:
-                    ReadAthleteFeedback();
+                    CoachReadAthleteFeedback();
                     break;
                 case 6:
-                    CreateFeedback();
+                    CoachCreateFeedback();
                     break;
                 default:
                     Console.WriteLine("Invalid choice. Please try again.");
@@ -390,7 +389,7 @@ namespace Zuydfit
             }
         }
 
-        public static void CreateAthlete()
+        public static void CoachCreateAthlete()
         {
             Console.Clear();
             Console.WriteLine("Adding a new person:");
@@ -416,7 +415,7 @@ namespace Zuydfit
             Console.WriteLine("Athlete added succesfully!");
         }
 
-        public static void SeeAthleteProgression()
+        public static void CoachSeeAthleteProgression()
         {
             List<Person> persons = Person.GetPersons();
 
@@ -488,7 +487,7 @@ namespace Zuydfit
 
         }
 
-        public static void ViewAllActivities()
+        public static void CoachViewAllActivities()
         {
             List<Activity> activities = Activity.ReadAllActivities();
             foreach (Activity activity in activities)
@@ -497,7 +496,7 @@ namespace Zuydfit
             }
         }
 
-        public static void CreateActivity()
+        public static void CoachCreateActivity()
         {
             Console.Clear();
             Console.WriteLine("Creating new activity:");
@@ -514,7 +513,7 @@ namespace Zuydfit
             CoachMainMenu();
         }
         
-        public static void AthleteProgression()
+        public static void CoachAthleteProgression()
         {
             List<Person> persons = Person.GetPersons();
             foreach (Person person in persons)
@@ -585,7 +584,7 @@ namespace Zuydfit
             //}
         }
 
-        public static void ReadAthleteFeedback()
+        public static void CoachReadAthleteFeedback()
         {
             Console.Clear();
             Console.WriteLine("Choose a person to view progression:");
@@ -622,7 +621,7 @@ namespace Zuydfit
             CoachMainMenu();
         }
         
-        public static void CreateFeedback()
+        public static void CoachCreateFeedback()
         {
             Console.Clear();
             Console.WriteLine("Choose a person to give them feedback:");
@@ -664,16 +663,16 @@ namespace Zuydfit
             switch (choice)
             {
                 case 1:
-                    ViewCoaches();
+                    AdministratorViewCoaches();
                     break;
                 case 2:
-                    CreateCoach();
+                    AdministratorCreateCoach();
                     break;
                 case 3:
-                    DeleteCoach();
+                    AdministratorDeleteCoach();
                     break;
                 case 4:
-                    UpdateCoach();
+                    AdministratorUpdateCoach();
                     break;
                 default:
                     Console.WriteLine("Invalid choice");
@@ -681,7 +680,7 @@ namespace Zuydfit
             }
         }
 
-        public static void ViewCoaches()
+        public static void AdministratorViewCoaches()
         {
 
             Console.Clear();
@@ -700,7 +699,7 @@ namespace Zuydfit
             Console.ReadKey();
         }
 
-        public static void CreateCoach()
+        public static void AdministratorCreateCoach()
         {
             Console.Clear();
             Console.WriteLine("Adding a new coach:");
@@ -730,7 +729,7 @@ namespace Zuydfit
             Console.ReadKey();
         }
 
-        public static void DeleteCoach()
+        public static void AdministratorDeleteCoach()
         {
             Console.Clear();
             Console.WriteLine("Deleting a coach:");
@@ -765,7 +764,7 @@ namespace Zuydfit
             Console.ReadKey();
         }
 
-        public static void UpdateCoach()
+        public static void AdministratorUpdateCoach()
         {
             static string InputValue(string prompt)
             {
