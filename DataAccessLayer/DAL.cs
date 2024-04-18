@@ -603,11 +603,10 @@ namespace Zuydfit.DataAccessLayer
         public List<Location> ReadLocations()
         {
             List<Location> locations = new List<Location>();
-
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string sql = "SELECT Id, Name, Streetname, Housenumber, Postalcode FROM Location"; // Verwijderd WHERE Id = @locationId
+                string sql = "SELECT Id, Name, Streetname, Housenumber, Postalcode FROM Location";
                 SqlCommand command = new SqlCommand(sql, connection);
 
                 using (SqlDataReader reader = command.ExecuteReader())
