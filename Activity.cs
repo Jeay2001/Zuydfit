@@ -34,6 +34,21 @@ namespace Zuydfit
             Athletes = athletes;
         }
 
+        public void AddAthlete(Athlete athlete)
+        {
+            // Checks if the athlete is already in the list
+            foreach (Athlete a in Athletes)
+            {
+                if (a.Id == athlete.Id)
+                {
+                    return;
+                }
+            }
+            DAL dal = new DAL();
+            dal.AddAthleteToActivity(this, athlete);
+            Athletes.Add(athlete);
+        }
+
         public Activity ReadActivity(int id)
         {
             DAL dal = new DAL();

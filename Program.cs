@@ -62,7 +62,8 @@ namespace Zuydfit
                 "View workouts",
                 "New workout",
                 "My progression",
-                "View feedback"
+                "View feedback",
+                "Join activity",
             ];
             int choice = DisplayMenuOptions(options, "Main menu, choose one of the options");
 
@@ -83,6 +84,10 @@ namespace Zuydfit
                 case 4:
                     // Instructor feedback
                     AthleteFeedback(athlete);
+                    break;
+                case 5:
+                    // Join activity
+                    AthleteJoinActivity(athlete);
                     break;
                 default:
                     Console.WriteLine("Invalid choice");
@@ -218,6 +223,62 @@ namespace Zuydfit
             }
         }
 
+        public static void AthleteViewActivities(Athlete athlete)
+        {
+            List<Activity> activities = Activity.ReadAllActivities();
+            foreach (Activity activity in activities)
+            {
+                Console.WriteLine($"Activity: {activity.Id} - {activity.Name} - {activity.Duration}");
+            }
+            //List<string> options = new List<string>
+            //{
+            //    "Go back",
+            //};
+
+            //foreach (Activity activity in activities)
+            //{
+            //    options.Add(activity.Name);
+            //}
+
+            //int choice = DisplayMenuOptions(options, "Choose an activity to join");
+
+            //if (choice == 1)
+            //{
+            //    AthleteMainMenu(athlete);
+            //}
+            //else
+            //{
+            //    Activity chosenActivity = activities[choice - 2];
+            //    chosenActivity.AddAthlete(athlete);
+            //    AthleteViewActivities(athlete);
+            //}
+        }
+
+        public static void AthleteJoinActivity(Athlete athlete)
+        {
+            Console.Clear();
+            List<Activity> activities = Activity.ReadAllActivities();
+            List<string> options = new List<string>
+            {
+                "Go back",
+            };
+            foreach (Activity activity in activities)
+            {
+                options.Add(activity.Name);
+            }
+            int choice = DisplayMenuOptions(options, "Choose an activity to join");
+
+            if (choice == 1) { 
+                // Previous menu
+                AthleteMainMenu(athlete);
+            } else
+            {
+                Activity chosenActivity = activities[choice - 2];
+                chosenActivity.AddAthlete(athlete);
+                AthleteJoinActivity(athlete);
+            }
+        }
+
         public static void AthleteSingleWorkout(Athlete athlete, Workout workout)
         {
             List<string> options = [
@@ -301,7 +362,6 @@ namespace Zuydfit
             }
             else if (exerciseType == "cardio")
             {
-                // To do - cardio
                 Console.Write("Exercise duration (leave empty if needed): ");
                 string duration = Console.ReadLine();
                 Console.Write("Exercise distance (leave empty if needed): ");
@@ -311,7 +371,6 @@ namespace Zuydfit
                 newExercise.CreateExercise(workout, newExercise);
                 return newExercise;
             }
-            // To do - exercise type controleren
             return new Strength(0, "test");
         }
 
@@ -350,7 +409,7 @@ namespace Zuydfit
                 "View all activities",
                 "Create activity",
                 "Read Athlete Feedback",
-                "To do - Give Athlete Feedback",
+                "To do Give Athlete Feedback",
             };
 
             int choice = DisplayMenuOptions(options, "Coach Menu");
@@ -481,10 +540,24 @@ namespace Zuydfit
 
         public static void CoachViewAllActivities()
         {
+            Console.Clear();
             List<Activity> activities = Activity.ReadAllActivities();
             foreach (Activity activity in activities)
             {
                 Console.WriteLine($"Activity: {activity.Id} - {activity.Name} - {activity.Duration}");
+            }
+
+            List<string> options = new List<string> {
+                "Go back",
+            };
+
+            int choice = DisplayMenuOptions(options, "", null, false);
+
+            switch (choice)
+            {
+                case 1:
+                    CoachMainMenu();
+                    break;
             }
         }
 
@@ -502,7 +575,7 @@ namespace Zuydfit
             newActivity.CreateActivity();
             Console.WriteLine("Activity Created Succesfully!");
 
-            CoachMainMenu();
+            CoachViewAllActivities();
         }
         
         public static void CoachAthleteProgression()
@@ -607,8 +680,19 @@ namespace Zuydfit
             }
 
             Console.WriteLine("");
-            Console.WriteLine("Press any key to go back.");
-            Console.ReadKey();
+
+            List<string> options = new List<string> {
+                "Go back",
+            };
+
+            int choice = DisplayMenuOptions(options, "", null, false);
+
+            switch (choice)
+            {
+                case 1:
+                    CoachMainMenu();
+                    break;
+            }
 
             CoachMainMenu();
         }
@@ -636,8 +720,7 @@ namespace Zuydfit
             // To do - create feedback in PersonFeedback table in database
             Feedback newFeedback = new Feedback(1, message, DateTime.Now);
             newFeedback.CreateFeedback();
-            Console.WriteLine("Feedback Created Succesfully!");
-
+            CoachMainMenu();
         }
 
 

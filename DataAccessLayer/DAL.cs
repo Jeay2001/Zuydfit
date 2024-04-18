@@ -299,9 +299,6 @@ namespace Zuydfit.DataAccessLayer
             return newWorkout;
         }
 
-
-
-
         public List<Exercise> ReadExerciseListFromAthlete(Athlete athlete)
         {
             List<Exercise> exercises = new List<Exercise>();
@@ -357,9 +354,6 @@ namespace Zuydfit.DataAccessLayer
             }
             return exercises;
         }
-
-
-        
 
         public bool DeleteWorkout(Workout workout)
         {
@@ -816,13 +810,9 @@ namespace Zuydfit.DataAccessLayer
                         if (administrator.Feedback != null)
                         {
                             command.Parameters.AddWithValue("@FeedbackId", administrator.Feedback.Id);
+                            // To do - insert into PersonFeedback
                         }
-                        else
-                        {
-                            // Handle the case when athlete.Feedback is null
-                            // For example, you might want to set the parameter to DBNull.Value
-                            command.Parameters.AddWithValue("@FeedbackId", DBNull.Value);
-                        }
+                        
                         command.Parameters.AddWithValue("@Type", "Administrator");
                     }
                     else
@@ -835,11 +825,24 @@ namespace Zuydfit.DataAccessLayer
             }
         }
 
+        public void AddAthleteToActivity(Activity activity, Athlete athlete)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "INSERT INTO PersonActivity (PersonID, ActivityID) VALUES (@PersonID, @ActivityID)";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@PersonID", athlete.Id);
+                    command.Parameters.AddWithValue("@ActivityID", activity.Id);
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
         /// <summary>
         /// Update a person in the database.
         /// </summary>
-        /// <param name="person"></param>
-        /// <exception cref="ArgumentException"></exception>
         public void UpdatePerson(Person person)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
