@@ -7,15 +7,11 @@ using System.Numerics;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Zuydfit;
 namespace Zuydfit.DataAccessLayer
-{ 
+{
     public class DAL
     {
         private readonly string connectionString = "Data Source=sqlserverjeaysnijders.database.windows.net; Initial Catalog = Zuydfit; User ID = Jeay2001; Password=Snijders2208@";
-
-        
-
 
         /* Exercise */
         public Exercise CreateExercise(Workout workout, Exercise exercise)
@@ -509,13 +505,20 @@ namespace Zuydfit.DataAccessLayer
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                connection.Open();
-                string query = "INSERT INTO PersonActivity (PersonID, ActivityID) VALUES (@PersonID, @ActivityID)";
-                using (SqlCommand command = new SqlCommand(query, connection))
+                try
                 {
-                    command.Parameters.AddWithValue("@PersonID", athlete.Id);
-                    command.Parameters.AddWithValue("@ActivityID", activity.Id);
-                    command.ExecuteNonQuery();
+                    connection.Open();
+                    string query = "INSERT INTO PersonActivity (PersonID, ActivityID) VALUES (@PersonID, @ActivityID)";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@PersonID", athlete.Id);
+                        command.Parameters.AddWithValue("@ActivityID", activity.Id);
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch
+                {
+                    Console.WriteLine("An error occurred while adding the athlete to the activity.");
                 }
             }
         }
@@ -533,7 +536,7 @@ namespace Zuydfit.DataAccessLayer
                 }
             }
         }
-
+        
         /* Machines */
         public List<Machine> Machines { get; set; } = new List<Machine>();
 
@@ -649,6 +652,7 @@ namespace Zuydfit.DataAccessLayer
 
             return machine;
         }
+
         public List<Location> ReadMachineLocations()
         {
             List<Location> locations = new List<Location>();
@@ -857,8 +861,8 @@ namespace Zuydfit.DataAccessLayer
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string query = "INSERT INTO Person (Firstname, Lastname, Streetname, Housenumber, Postalcode, Type, LocationId, FeedbackId) " +
-                    "VALUES (@Firstname, @Lastname, @Streetname, @Housenumber, @Postalcode, @Type, @LocationId, @FeedbackId) SELECT SCOPE_IDENTITY()";
+                string query = "INSERT INTO Person (Firstname, Lastname, Streetname, Housenumber, Postalcode, Type, LocationId) " +
+                    "VALUES (@Firstname, @Lastname, @Streetname, @Housenumber, @Postalcode, @Type, @LocationId) SELECT SCOPE_IDENTITY()";
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Firstname", person.FirstName);
@@ -867,46 +871,19 @@ namespace Zuydfit.DataAccessLayer
                     command.Parameters.AddWithValue("@Housenumber", person.HouseNumber);
                     command.Parameters.AddWithValue("@Postalcode", person.PostalCode);
 
-                    //indicate in the program whether it is a coach or an athlete
                     if (person is Athlete athlete)
                     {
                         command.Parameters.AddWithValue("@LocationId", athlete.Location.Id);
-                        if (athlete.Feedback != null)
-                        {
-                            command.Parameters.AddWithValue("@FeedbackId", athlete.Feedback.Id);
-                        }
-                        else
-                        {
-                            // Handle the case when athlete.Feedback is null
-                            // For example, you might want to set the parameter to DBNull.Value
-                            command.Parameters.AddWithValue("@FeedbackId", DBNull.Value);
-                        }
                         command.Parameters.AddWithValue("@Type", "Athlete");
                     }
                     else if (person is Coach coach)
                     {
                         command.Parameters.AddWithValue("@LocationId", DBNull.Value);
-                        if (coach.Feedback != null)
-                        {
-                            command.Parameters.AddWithValue("@FeedbackId", coach.Feedback.Id);
-                        }
-                        else
-                        {
-                            // Handle the case when athlete.Feedback is null
-                            // For example, you might want to set the parameter to DBNull.Value
-                            command.Parameters.AddWithValue("@FeedbackId", DBNull.Value);
-                        }
                         command.Parameters.AddWithValue("@Type", "Coach");
                     }
                     else if (person is Administrator administrator)
                     {
                         command.Parameters.AddWithValue("@LocationId", DBNull.Value);
-                        if (administrator.Feedback != null)
-                        {
-                            command.Parameters.AddWithValue("@FeedbackId", administrator.Feedback.Id);
-                            // To do - insert into PersonFeedback
-                        }
-                        
                         command.Parameters.AddWithValue("@Type", "Administrator");
                     }
                     else
@@ -927,7 +904,7 @@ namespace Zuydfit.DataAccessLayer
                 try
                 {
                     string query = "UPDATE Person SET Firstname = @Firstname, Lastname = @Lastname, Streetname = @Streetname, " +
-                        "Housenumber = @Housenumber, Postalcode = @Postalcode, Type = @Type, LocationId = @locationId, FeedbackId = @FeedbackId WHERE Id = @Id";
+                        "Housenumber = @Housenumber, Postalcode = @Postalcode, Type = @Type, LocationId = @locationId WHERE Id = @Id";
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         command.Parameters.AddWithValue("@Firstname", person.FirstName);
@@ -938,47 +915,17 @@ namespace Zuydfit.DataAccessLayer
                         if (person is Athlete athlete)
                         {
                             command.Parameters.AddWithValue("@LocationId", athlete.Location.Id);
-                            if (athlete.Feedback != null)
-                            {
-                                command.Parameters.AddWithValue("@FeedbackId", athlete.Feedback.Id);
-                            }
-                            else
-                            {
-                                // Handle the case when athlete.Feedback is null
-                                // For example, you might want to set the parameter to DBNull.Value
-                                command.Parameters.AddWithValue("@FeedbackId", DBNull.Value);
-                            }
+
                             command.Parameters.AddWithValue("@Type", "Athlete");
                         }
                         else if (person is Coach coach)
                         {
                             command.Parameters.AddWithValue("@LocationId", DBNull.Value);
-                            if (coach.Feedback != null)
-                            {
-                                command.Parameters.AddWithValue("@FeedbackId", coach.Feedback.Id);
-                            }
-                            else
-                            {
-                                // Handle the case when athlete.Feedback is null
-                                // For example, you might want to set the parameter to DBNull.Value
-                                command.Parameters.AddWithValue("@FeedbackId", DBNull.Value);
-                            }
                             command.Parameters.AddWithValue("@Type", "Coach");
                         }
                         else if (person is Administrator administrator)
                         {
                             command.Parameters.AddWithValue("@LocationId", DBNull.Value);
-                            if (administrator.Feedback != null)
-                            {
-                                command.Parameters.AddWithValue("@FeedbackId", administrator.Feedback.Id);
-                            }
-                            else
-                            {
-                                // Handle the case when athlete.Feedback is null
-                                // For example, you might want to set the parameter to DBNull.Value
-                                command.Parameters.AddWithValue("@FeedbackId", DBNull.Value);
-                            }
-                            command.Parameters.AddWithValue("@Type", "Administrator");
                         }
                         else
                         {
@@ -1154,7 +1101,7 @@ namespace Zuydfit.DataAccessLayer
         {
             try
             {
-                List<Feedback> results = new List<Feedback>(); // Create a new list to store the feedback objects
+                List<Feedback> results = new List<Feedback>(); 
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
@@ -1172,12 +1119,12 @@ namespace Zuydfit.DataAccessLayer
                                 int id = reader.GetInt32(0);
                                 string message =  reader.GetString(1);
                                 DateTime date = reader.GetDateTime(2);
-                                Feedback feedback = new Feedback(id, message, date); // Create a new feedback object
-                                results.Add(feedback); // Add the feedback object to the list
+                                Feedback feedback = new Feedback(id, message, date); 
+                                results.Add(feedback); 
                             }
                         }
                     }
-                    return results; // Return the list of feedback objects
+                    return results; 
 
                 }
             }
@@ -1187,7 +1134,6 @@ namespace Zuydfit.DataAccessLayer
                 return null;
             }
         }
-
 
         public List<Feedback> ReadAllFeedback()
         {
@@ -1246,7 +1192,6 @@ namespace Zuydfit.DataAccessLayer
                     rowsAffected = command.ExecuteNonQuery();
                 }
             }
-            // Retourneer true als er rijen zijn beïnvloed, wat aangeeft dat de verwijdering is geslaagd.
             return rowsAffected > 0;
         }
     }

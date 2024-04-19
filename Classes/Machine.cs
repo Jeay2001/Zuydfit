@@ -19,10 +19,6 @@ namespace Zuydfit
             Name = name;
         }
 
-        public Machine()
-        {
-        }
-
         public void UpdateMachineLocation()
         {
             DAL dal = new DAL();

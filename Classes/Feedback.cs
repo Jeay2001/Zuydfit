@@ -13,7 +13,6 @@ namespace Zuydfit
         public string FeedbackMessage { get; set; }
 
         public DateTime Date { get; set; }
-        public Athlete Athlete { get; set; }
 
         public Feedback(int id, string feedback, DateTime date)
         {
@@ -21,9 +20,6 @@ namespace Zuydfit
             FeedbackMessage = feedback;
             Date = date;
         }
-
-
-
       
         public static List<Feedback> ReadPersonFeedback(int Id)
         {

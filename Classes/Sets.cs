@@ -13,7 +13,6 @@ namespace Zuydfit
         public int Reps { get; set; }
         public double Weight { get; set; }
 
-
         public Sets(int id, int reps, double weight)
         {
             Id = id;
