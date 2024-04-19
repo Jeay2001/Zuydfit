@@ -646,7 +646,6 @@ namespace Zuydfit.DataAccessLayer
         public List<Location> ReadLocations()
         {
             List<Location> locations = new List<Location>();
-
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
