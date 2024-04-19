@@ -654,23 +654,28 @@ namespace Zuydfit
             newFeedback.CreatePersonFeedback(athleteId, newFeedback.Id);
             Console.WriteLine("Feedback Created Succesfully!");
 
+
         }
 
 
         /* Administrator menu's */
         static void AdministratorMainMenu()
         {
-            List<string> options = new List<string> {
+            bool exit = false;
+            while (!exit)
+            {
+                Console.Clear();
+                List<string> options = new List<string> {
                 "View coaches",
                 "Add coach",
                 "Delete coach",
                 "Update coach",
-                "Show Location",
-                "Show Machines",
-                "Show machine location",
+                "Show locations",
+                "Show machines",
+                "Show Location of machines",
                 "Exit"
-            };
-            int choice = DisplayMenuOptions(options, "Administrator Menu");
+                };
+                int choice = DisplayMenuOptions(options, "Administrator Menu");
 
                 switch (choice)
                 {
@@ -693,6 +698,9 @@ namespace Zuydfit
                         ReadMachines();
                         break;
                     case 7:
+                        AdministratorReadMachineLocation();
+                        break;
+                    case 8:
                         exit = true;
                         break;
                     default:
@@ -702,9 +710,23 @@ namespace Zuydfit
                         break;
                 }
             }
-            MainMenu(null); // Ga terug naar het hoofdmenu
+            MainMenu(null);
         }
-
+        public static void AdministratorReadMachineLocation()
+        {
+            Console.Clear();
+            List<Location> locations = Location.ReadMachineLocations();
+            foreach (Location location in locations)
+            {
+                Console.WriteLine($"Location: {location.Id} - {location.Name}");
+                foreach (Machine machine in location.Machines)
+                {
+                    Console.WriteLine($"  Machine: {machine.Id} - {machine.Name}");
+                }
+            }
+            Console.WriteLine("\nPress any key to return to the menu...");
+            Console.ReadKey();
+        }
         public static void ReadMachines()
         {
             Console.Clear();
@@ -908,18 +930,7 @@ namespace Zuydfit
             }
 
         }
-        public static void AdministratorReadMachineLocation() 
-        {
-            List<Location> locations = Location.ReadMachineLocations();
-            foreach (Location location in locations)
-            {
-                Console.WriteLine($"Location: {location.Id} - {location.Name}");
-                foreach (Machine machine in location.Machines)
-                {
-                    Console.WriteLine($"  Machine: {machine.Id} - {machine.Name}");
-                }
-            }
-        }
+        
 
 
         /* Print Method's */
