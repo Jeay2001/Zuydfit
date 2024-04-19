@@ -89,5 +89,13 @@ namespace Zuydfit
             List<Activity> returnedActivities = dal.ReadAllActivities();
             return returnedActivities;
         }
+
+        public static List <Activity> ReadActivitieMembers() 
+        { 
+            DAL dal = new DAL();
+            List<Activity> activities = dal.ReadActivitieMembers();
+            return activities;
+        }
+
     }
 }

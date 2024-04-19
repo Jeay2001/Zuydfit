@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Zuydfit;
 namespace Zuydfit.DataAccessLayer
-{ 
+{
     public class DAL
     {
         private readonly string connectionString = "Data Source=sqlserverjeaysnijders.database.windows.net; Initial Catalog = Zuydfit; User ID = Jeay2001; Password=Snijders2208@";
@@ -309,7 +309,7 @@ namespace Zuydfit.DataAccessLayer
                     newWorkout = new Workout(id, date);
                     index++;
                 }
-                
+
                 int exerciseId = Convert.ToInt32(reader[2]);
                 string name = reader[3].ToString();
                 string type = reader[4].ToString();
@@ -357,6 +357,68 @@ namespace Zuydfit.DataAccessLayer
             }
             return newWorkout;
         }
+
+
+
+
+        //public List<Exercise> ReadExerciseListFromAthlete(Athlete athlete)
+        //{
+        //    List<Exercise> exercises = new List<Exercise>();
+
+        //    using SqlConnection connection = new(connectionString);
+        //    connection.Open();
+        //    string productQuery = "select exercise.Id, exercise.Name, exercise.Type, exercise.duration, exercise.Distance, exercise.MachineId, sets.id, sets.Weight, sets.Reps  from personWorkout\r\ninner join workout on workout.id = personWorkout.workoutid\r\ninner join ExerciseWorkout on ExerciseWorkout.workoutid = workout.id\r\ninner join exercise on exercise.id = exerciseWorkout.ExerciseID\r\ninner join exerciseSet on exerciseSet.setId = setid\r\ninner join sets on exerciseset.SetId = sets.Id " +
+        //        "where personWorkout.personid = @id";
+        //    using SqlCommand command = new(productQuery, connection);
+        //    command.Parameters.AddWithValue("@Id", athlete.Id);
+        //    command.ExecuteNonQuery();
+
+        //    using SqlDataReader reader = command.ExecuteReader();
+        //    Exercise previousExercise = new Strength(0, "");
+        //    while (reader.Read())
+        //    {
+        //        int exerciseId = Convert.ToInt32(reader[0]);
+        //        string name = reader[1].ToString();
+        //        string type = reader[2].ToString();
+        //        if (type.ToLower() == "strength")
+        //        {
+        //            if (previousExercise.Id != exerciseId)
+        //            {
+        //                Strength strengthExercise = new Strength(exerciseId, name, []);
+        //                exercises.Add(strengthExercise);
+        //                previousExercise = strengthExercise;
+        //            }
+        //            if (reader[5] != DBNull.Value)
+        //            {
+        //                int machineId = Convert.ToInt32(reader[5]);
+        //            }
+        //            if (reader[7] != DBNull.Value)
+        //            {
+        //                int setId = Convert.ToInt32(reader[6]);
+        //                int weight = Convert.ToInt32(reader[7]);
+        //                int amount = Convert.ToInt32(reader[8]);
+        //                Sets set = new Sets(setId, amount, weight);
+        //                Strength previousStrengthExercise = previousExercise as Strength;
+        //                previousStrengthExercise.Sets.Add(set);
+        //            }
+        //        }
+        //        else if (type.ToLower() == "cardio")
+        //        {
+        //            string duration = reader[3].ToString();
+        //            string distance = reader[4].ToString();
+        //            if (previousExercise.Id != exerciseId)
+        //            {
+        //                Cardio cardioExercise = new Cardio(exerciseId, name, duration, distance);
+        //                exercises.Add(cardioExercise);
+        //                previousExercise = cardioExercise;
+        //            }
+        //        }
+        //    }
+        //    return exercises;
+        //}
+
+
+
 
         public bool DeleteWorkout(Workout workout)
         {
@@ -534,7 +596,49 @@ namespace Zuydfit.DataAccessLayer
             }
         }
 
-        /* Machines */
+        public List<Activity> ReadActivitieMembers()
+        {
+            Location location = new Location(1, "locatie 1", "straatnaam", "huisnummer", "1837jd", []);
+            List<Activity> activities = new List<Activity>();
+            List<Feedback> feedback = new List<Feedback>();
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "SELECT activity.Id, activity.Name, activity.Duration, person.Firstname, person.Lastname FROM Activity full " +
+                    "join PersonActivity on Activity.Id = PersonActivity.ActivityId " +
+                    "full join Person on PersonActivity.PersonId = Person.Id ";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+
+                        while (reader.Read())
+                        {
+                            string firstName = reader.IsDBNull(3) ? string.Empty : reader.GetString(3);
+                            string lastName = reader.IsDBNull(4) ? string.Empty : reader.GetString(4);
+                            if (!string.IsNullOrEmpty(firstName) && !string.IsNullOrEmpty(lastName))
+                            {
+                                Athlete athlete = new Athlete(1, firstName, lastName, "test", "test", "test", location, feedback);
+                                if (activities.Any(activity => activity.Id == reader.GetInt32(0)))
+                                {
+                                    Activity activity = activities.Find(activity => activity.Id == reader.GetInt32(0));
+                                    activity.Athletes.Add(athlete);
+                                }
+                                else
+                                {
+                                    Activity newActivity = new Activity(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), new List<Athlete>());
+                                    newActivity.Athletes.Add(athlete);
+                                    activities.Add(newActivity);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return activities;
+        }
+
         public List<Machine> Machines { get; set; } = new List<Machine>();
 
         public List<Machine> ReadMachines()
