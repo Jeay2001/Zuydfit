@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Zuydfit;
 namespace Zuydfit.DataAccessLayer
-{ 
+{
     public class DAL
     {
         private readonly string connectionString = "Data Source=sqlserverjeaysnijders.database.windows.net; Initial Catalog = Zuydfit; User ID = Jeay2001; Password=Snijders2208@";
@@ -250,7 +250,7 @@ namespace Zuydfit.DataAccessLayer
                     newWorkout = new Workout(id, date);
                     index++;
                 }
-                
+
                 int exerciseId = Convert.ToInt32(reader[2]);
                 string name = reader[3].ToString();
                 string type = reader[4].ToString();
@@ -359,7 +359,7 @@ namespace Zuydfit.DataAccessLayer
         }
 
 
-        
+
 
         public bool DeleteWorkout(Workout workout)
         {
@@ -483,9 +483,44 @@ namespace Zuydfit.DataAccessLayer
                 }
             }
         }
-        
 
-        
+        public List<Activity> ReadActivitieMembers()
+        {
+            Location location = new Location(1, "locatie 1", "straatnaam", "huisnummer", "1837jd", []);
+            List<Activity> activities = new List<Activity>();
+            List<Feedback> feedback = new List<Feedback>();
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "SELECT activity.Name, activity.Duration, person.Firstname, person.Lastname FROM Activity full " +
+                    "join PersonActivity on Activity.Id = PersonActivity.ActivityId" +
+                    "full join Person on PersonActivity.PersonId = Person.Id ";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            string name = reader["Name"].ToString();
+                            string duration = reader["Duration"].ToString();
+                            Activity activity = new Activity(1, name, duration, new List<Athlete>());
+
+                            string firstname = reader["Firstname"].ToString();
+                            string lastname = reader["Lastname"].ToString();
+                            activities.Add(activity);
+
+                            Person athlete = new Athlete(1, firstname, lastname,"1212","1","1234", location, feedback);
+                            activities.Add(athlete);
+
+
+                        }
+                    }
+                }
+            }
+            return activities;
+        }
+
         public List<Machine> Machines { get; set; } = new List<Machine>();
         public List<Machine> ReadMachines()
         {

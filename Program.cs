@@ -390,10 +390,18 @@ namespace Zuydfit
                 case 6:
                     CoachCreateFeedback();
                     break;
+                case 7:
+                    Viewactivitymembers();
+                        break;
                 default:
                     Console.WriteLine("Invalid choice. Please try again.");
                     break;
             }
+        }
+
+        public static void Viewactivitymembers()
+        {
+
         }
 
         public static void CoachCreateAthlete()
