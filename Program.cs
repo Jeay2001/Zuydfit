@@ -12,19 +12,21 @@ namespace Zuydfit
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Welkom bij Zuydfit!");
+            Console.WriteLine("Welcome to Zuydfit!");
 
 
-            Location location = new Location(2, "locatie 1", "straatnaam", "huisnummer", "1837jd", []);
+            Location location = new Location(1, "locatie 1", "straatnaam", "huisnummer", "1837jd", []);
             List<Feedback> feedbacks = new List<Feedback>();
 
-            Athlete athlete = new Athlete(2, "John", "Doe", "Street", "1", "1234", [], location, feedbacks);
+            Athlete athlete = new Athlete(4, "John", "Doe", "Street", "1", "1234", [], location, []);
 
-            while (true) // Oneindige lus om de console open te houden
-            {
-                MainMenu(athlete);
-            }
-
+            //List<Feedback> feedbacks = Feedback.ReadPersonFeedback(athlete.Id);
+            //Console.WriteLine("Feedback:");
+            //foreach (Feedback fb in feedbacks)
+            //{
+            //    Console.WriteLine("test");
+            //    Console.WriteLine($"- {fb.FeedbackMessage}");
+            //}
 
 
             bool flag = true;
@@ -32,10 +34,11 @@ namespace Zuydfit
             {
                 Console.WriteLine("");
                 MainMenu(athlete);
+
                 flag = false;
             }
         }
-        
+
 
         /* Main Menu */
         public static void MainMenu(Athlete athlete)
@@ -146,7 +149,7 @@ namespace Zuydfit
             Workout workout = new Workout(0, DateTime.Now);
             workout = workout.CreateWorkout(workout, athlete);
             int choice = DisplayMenuOptions(options, "Create workout menu", workout);
-                
+
             if (choice == 1)
             {
                 Exercise newExercise = AthleteCreateExercise(workout);
@@ -257,10 +260,16 @@ namespace Zuydfit
             List<string> options = [
                 "Go back",
             ];
+            List<Feedback> feedbacks = Feedback.ReadPersonFeedback(athlete.Id);
+            Console.Clear();
+            Console.WriteLine("Feedback:");
+            foreach (Feedback fb in feedbacks)
+            {
+                Console.WriteLine($"- {fb.FeedbackMessage}");
+            }
+            int choice = DisplayMenuOptions(options, "", null, false);
 
-            int choice = DisplayMenuOptions(options, "To do - View feedback");
-
-            if (choice == 1)
+                if (choice == 1)
             {
                 AthleteMainMenu(athlete);
             }
@@ -452,7 +461,7 @@ namespace Zuydfit
                 "View all activities",
                 "Create activity",
                 "Read Athlete Feedback",
-                "To do Give Athlete Feedback",
+                "Give Athlete Feedback",
             };
 
             int choice = DisplayMenuOptions(options, "Coach Menu");
@@ -620,7 +629,7 @@ namespace Zuydfit
 
             CoachViewAllActivities();
         }
-        
+
         public static void CoachAthleteProgression()
         {
             List<Person> persons = Person.GetPersons();
@@ -701,7 +710,7 @@ namespace Zuydfit
 
             foreach (Person person in persons)
             {
-                if (person is Athlete)  
+                if (person is Athlete)
                 {
                     Console.WriteLine($"Athlete: {person.Id} - {person.FirstName} {person.LastName}");
                 }
@@ -715,7 +724,7 @@ namespace Zuydfit
                 Console.WriteLine($"Feedback van {athlete.FirstName} {athlete.LastName}:");
                 Console.WriteLine("");
             }
-            
+
             List<Feedback> feedbacks = Feedback.ReadAllFeedback();
             foreach (Feedback feedback in feedbacks)
             {
@@ -739,7 +748,7 @@ namespace Zuydfit
 
             CoachMainMenu();
         }
-        
+
         public static void CoachCreateFeedback()
         {
             Console.Clear();
@@ -760,8 +769,13 @@ namespace Zuydfit
             Console.Write("Enter feedback message: ");
             string message = Console.ReadLine();
 
-            // To do - create feedback in PersonFeedback table in database
             Feedback newFeedback = new Feedback(1, message, DateTime.Now);
+            newFeedback = newFeedback.CreateFeedback();
+
+            newFeedback.CreatePersonFeedback(athleteId, newFeedback.Id);
+            Console.WriteLine("Feedback Created Succesfully!");
+
+
             newFeedback.CreateFeedback();
             CoachMainMenu();
         }
@@ -770,32 +784,99 @@ namespace Zuydfit
         /* Administrator menu's */
         static void AdministratorMainMenu()
         {
-            List<string> options = new List<string> {
+            bool exit = false;
+            while (!exit)
+            {
+                Console.Clear();
+                List<string> options = new List<string> {
                 "View coaches",
                 "Add coach",
                 "Delete coach",
-                "Update coach"
-            };
-            int choice = DisplayMenuOptions(options, "Administrator Menu");
+                "Update coach",
+                "Show locations",
+                "Show machines",
+                "Show Location of machines",
+                "Exit"
+                };
+                int choice = DisplayMenuOptions(options, "Administrator Menu");
 
-            switch (choice)
-            {
-                case 1:
-                    AdministratorViewCoaches();
-                    break;
-                case 2:
-                    AdministratorCreateCoach();
-                    break;
-                case 3:
-                    AdministratorDeleteCoach();
-                    break;
-                case 4:
-                    AdministratorUpdateCoach();
-                    break;
-                default:
-                    Console.WriteLine("Invalid choice");
-                    break;
+                switch (choice)
+                {
+                    case 1:
+                        AdministratorViewCoaches();
+                        break;
+                    case 2:
+                        AdministratorCreateCoach();
+                        break;
+                    case 3:
+                        AdministratorDeleteCoach();
+                        break;
+                    case 4:
+                        AdministratorUpdateCoach();
+                        break;
+                    case 5:
+                        ReadLocations();
+                        break;
+                    case 6:
+                        ReadMachines();
+                        break;
+                    case 7:
+                        AdministratorReadMachineLocation();
+                        break;
+                    case 8:
+                        exit = true;
+                        break;
+                    default:
+                        Console.WriteLine("Invalid choice");
+                        Console.WriteLine("Press any key to try again.");
+                        Console.ReadKey();
+                        break;
+                }
             }
+            MainMenu(null);
+        }
+        public static void AdministratorReadMachineLocation()
+        {
+            Console.Clear();
+            List<Location> locations = Location.ReadMachineLocations();
+            foreach (Location location in locations)
+            {
+                Console.WriteLine($"Location: {location.Id} - {location.Name}");
+                foreach (Machine machine in location.Machines)
+                {
+                    Console.WriteLine($"  Machine: {machine.Id} - {machine.Name}");
+                }
+            }
+            Console.WriteLine("\nPress any key to return to the menu...");
+            Console.ReadKey();
+        }
+        public static void ReadMachines()
+        {
+            Console.Clear();
+            List<Machine> machines = Machine.ReadMachines();
+            Console.WriteLine("Machines:");
+            foreach (Machine machine in machines)
+            {
+                Console.WriteLine($"Machine ID = {machine.Id} Name = {machine.Name}");
+            }
+
+            Console.WriteLine("\nPress any key to return to the menu...");
+            Console.ReadKey();
+        }
+
+        public static void ReadLocations()
+        {
+            Console.Clear();
+            List<Location> locations = Location.ReadLocations();
+            Console.WriteLine("Locations:");
+            foreach (Location location in locations)
+            { 
+                Console.WriteLine($"Location ID = {location.Id} Name = {location.Name} Street name = {location.StreetName} House number = {location.HouseNumber} Postal code = {location.PostalCode}");
+            }
+
+   
+            Console.WriteLine("\nPress any key to return to the menu...");
+            Console.ReadKey();
         }
 
         public static void AdministratorViewCoaches()
@@ -972,6 +1053,7 @@ namespace Zuydfit
             }
 
         }
+        
 
 
         /* Print Method's */

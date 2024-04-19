@@ -24,6 +24,7 @@ namespace Zuydfit
             StreetName = streetName;
             HouseNumber = houseNumber;
             PostalCode = postalCode;
+            Machines = new List<Machine>();
         }
 
         public Location(int id, string name, string streetName, string houseNumber, string postalCode, List<Machine> machines)
@@ -70,6 +71,13 @@ namespace Zuydfit
             DAL dal = new DAL();
             bool isDeleted = dal.DeleteLocation(location.Id);
             return isDeleted;
+        }
+        
+        public static List<Location> ReadMachineLocations()
+        {
+            DAL dal = new DAL();
+            List<Location> locations = dal.ReadMachineLocations();
+            return locations;
         }
     }
 }
