@@ -63,6 +63,7 @@ namespace Zuydfit
                 "New workout",
                 "My progression",
                 "View feedback",
+                "View activities",
                 "Join activity",
             ];
             int choice = DisplayMenuOptions(options, "Main menu, choose one of the options");
@@ -86,6 +87,10 @@ namespace Zuydfit
                     AthleteFeedback(athlete);
                     break;
                 case 5:
+                    // Join activity
+                    AthleteViewActivities(athlete);
+                    break;
+                case 6:
                     // Join activity
                     AthleteJoinActivity(athlete);
                     break;
@@ -225,33 +230,29 @@ namespace Zuydfit
 
         public static void AthleteViewActivities(Athlete athlete)
         {
-            List<Activity> activities = Activity.ReadAllActivities();
+            List<string> options = new List<string>
+            {
+                "Go back",
+            };
+            List<Activity> activities = Activity.ReadAthleteActivities(athlete);
             foreach (Activity activity in activities)
             {
                 Console.WriteLine($"Activity: {activity.Id} - {activity.Name} - {activity.Duration}");
+                options.Add(activity.Name);
             }
-            //List<string> options = new List<string>
-            //{
-            //    "Go back",
-            //};
 
-            //foreach (Activity activity in activities)
-            //{
-            //    options.Add(activity.Name);
-            //}
+            int choice = DisplayMenuOptions(options, "Choose an activity to join");
 
-            //int choice = DisplayMenuOptions(options, "Choose an activity to join");
-
-            //if (choice == 1)
-            //{
-            //    AthleteMainMenu(athlete);
-            //}
-            //else
-            //{
-            //    Activity chosenActivity = activities[choice - 2];
-            //    chosenActivity.AddAthlete(athlete);
-            //    AthleteViewActivities(athlete);
-            //}
+            if (choice == 1)
+            {
+                AthleteMainMenu(athlete);
+            }
+            else
+            {
+                Activity chosenActivity = activities[choice - 2];
+                chosenActivity.AddAthlete(athlete);
+                AthleteViewActivities(athlete);
+            }
         }
 
         public static void AthleteJoinActivity(Athlete athlete)

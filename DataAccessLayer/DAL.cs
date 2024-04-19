@@ -447,6 +447,34 @@ namespace Zuydfit.DataAccessLayer
             return activities;
         }
 
+        public List<Activity> ReadAthleteActivities(Athlete athlete)
+        {
+            List<Activity> activities = new List<Activity>();
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "SELECT activity.Id, Name, Duration FROM Activity\r\nfull join PersonActivity on Activity.Id = PersonActivity.ActivityId\r\nfull join Person on PersonActivity.PersonId = Person.Id " +
+                    "where person.id = @personId";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@personId", athlete.Id);
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            int id = Convert.ToInt32(reader["Id"]);
+                            string name = reader["Name"].ToString();
+                            string duration = reader["Duration"].ToString();
+                            Activity activity = new Activity(id, name, duration, new List<Athlete>());
+                            activities.Add(activity);
+                        }
+                    }
+                }
+            }
+            return activities;
+        }
+
         public Activity UpdateActivity(Activity activity)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
