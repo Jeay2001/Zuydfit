@@ -11,9 +11,6 @@ namespace Zuydfit
         public List<Workout> Workouts { get; set; } = new List<Workout>(); 
         public Location Location { get; set; } 
         public List<Feedback> Feedbacks { get; set; } = new List<Feedback>();
-        public Feedback Feedback { get; set; }
-
-
 
         public Athlete(int id, string firstName, string lastName, string streetName, string houseNumber, string postalcode, List<Workout> workouts, Location location, List<Feedback> feedbacks)
             : base(id, firstName, lastName, streetName, houseNumber, postalcode)
