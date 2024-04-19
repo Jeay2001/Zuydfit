@@ -462,6 +462,7 @@ namespace Zuydfit
                 "Create activity",
                 "Read Athlete Feedback",
                 "Give Athlete Feedback",
+                "View activity members",
             };
 
             int choice = DisplayMenuOptions(options, "Coach Menu");
@@ -487,7 +488,7 @@ namespace Zuydfit
                     CoachCreateFeedback();
                     break;
                 case 7:
-                    Viewactivitymembers();
+                    ReadActivitieMembers();
                         break;
                 default:
                     Console.WriteLine("Invalid choice. Please try again.");
@@ -495,9 +496,33 @@ namespace Zuydfit
             }
         }
 
-        public static void Viewactivitymembers()
+        public static void ReadActivitieMembers()
         {
+            Console.Clear();
+            List<Activity> activities = Activity.ReadActivitieMembers();
+            Console.WriteLine("Activity members:");
+            foreach (Activity activity in activities)
+            {
+                Console.WriteLine($"ActivityId: {activity.Id}, Activity name: {activity.Name} - {activity.Duration}");
+                //foreach (Machine machine in location.Machines)\\
+                
+                foreach(Athlete athlete in activity.Athletes)
+                {
+                    Console.WriteLine($"    Members: Firstname: {athlete.FirstName}, Lastname: {athlete.LastName}");
+                }
+                Console.WriteLine("");
+            }
+            Console.WriteLine("");
+            List<string>options = new List<string>
+            {
 
+                "Go back",
+            };
+            int choice = DisplayMenuOptions(options,"",null,false);
+            if (choice == 1)
+            {
+                CoachMainMenu();
+            }
         }
 
         public static void CoachCreateAthlete()
