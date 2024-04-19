@@ -14,35 +14,10 @@ namespace Zuydfit.DataAccessLayer
     {
         private readonly string connectionString = "Data Source=sqlserverjeaysnijders.database.windows.net; Initial Catalog = Zuydfit; User ID = Jeay2001; Password=Snijders2208@";
 
-        public List<Workout> Workouts { get; set; } = new List<Workout>();
+        
 
-        public Workout CreateWorkout(Workout workout, Athlete athlete)
-        {
-            Console.WriteLine("Create workout in DAL");
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-                string query = "INSERT INTO Workout (Date) VALUES (@Date); SELECT SCOPE_IDENTITY();";
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@Date", workout.Date);
-                    int workoutId = Convert.ToInt32(command.ExecuteScalar());
-                    workout.Id = workoutId;
 
-                    string personWorkoutQuery = "INSERT INTO PersonWorkout(personId, workoutId) VALUES(@personId, @workoutId);";
-                    using (SqlCommand personWorkoutCommand = new SqlCommand(personWorkoutQuery, connection))
-                    {
-                        personWorkoutCommand.Parameters.AddWithValue("@personId", athlete.Id);
-                        personWorkoutCommand.Parameters.AddWithValue("@workoutId", workout.Id);
-                        personWorkoutCommand.ExecuteScalar();
-                        Console.WriteLine("inserted into personworkout");
-
-                    }
-                }
-            }
-            return workout;
-        }
-
+        /* Exercise */
         public Exercise CreateExercise(Workout workout, Exercise exercise)
         {
             Console.WriteLine("Creating exercise in database");
@@ -143,6 +118,91 @@ namespace Zuydfit.DataAccessLayer
             }
         }
 
+        public List<Exercise> ReadExerciseListFromAthlete(Athlete athlete)
+        {
+            List<Exercise> exercises = new List<Exercise>();
+
+            using SqlConnection connection = new(connectionString);
+            connection.Open();
+            string productQuery = "select exercise.Id, exercise.Name, exercise.Type, exercise.duration, exercise.Distance, exercise.MachineId, sets.id, sets.Weight, sets.Reps  from personWorkout\r\ninner join workout on workout.id = personWorkout.workoutid\r\ninner join ExerciseWorkout on ExerciseWorkout.workoutid = workout.id\r\ninner join exercise on exercise.id = exerciseWorkout.ExerciseID\r\ninner join exerciseSet on exerciseSet.setId = setid\r\ninner join sets on exerciseset.SetId = sets.Id " +
+                "where personWorkout.personid = @id";
+            using SqlCommand command = new(productQuery, connection);
+            command.Parameters.AddWithValue("@Id", athlete.Id);
+            command.ExecuteNonQuery();
+
+            using SqlDataReader reader = command.ExecuteReader();
+            Exercise previousExercise = new Strength(0, "");
+            while (reader.Read())
+            {
+                int exerciseId = Convert.ToInt32(reader[0]);
+                string name = reader[1].ToString();
+                string type = reader[2].ToString();
+                if (type.ToLower() == "strength")
+                {
+                    if (previousExercise.Id != exerciseId)
+                    {
+                        Strength strengthExercise = new Strength(exerciseId, name, []);
+                        exercises.Add(strengthExercise);
+                        previousExercise = strengthExercise;
+                    }
+                    if (reader[5] != DBNull.Value)
+                    {
+                        int machineId = Convert.ToInt32(reader[5]);
+                    }
+                    if (reader[7] != DBNull.Value)
+                    {
+                        int setId = Convert.ToInt32(reader[6]);
+                        int weight = Convert.ToInt32(reader[7]);
+                        int amount = Convert.ToInt32(reader[8]);
+                        Sets set = new Sets(setId, amount, weight);
+                        Strength previousStrengthExercise = previousExercise as Strength;
+                        previousStrengthExercise.Sets.Add(set);
+                    }
+                }
+                else if (type.ToLower() == "cardio")
+                {
+                    string duration = reader[3].ToString();
+                    string distance = reader[4].ToString();
+                    if (previousExercise.Id != exerciseId)
+                    {
+                        Cardio cardioExercise = new Cardio(exerciseId, name, duration, distance);
+                        exercises.Add(cardioExercise);
+                        previousExercise = cardioExercise;
+                    }
+                }
+            }
+            return exercises;
+        }
+
+        /* Workout */
+        public List<Workout> Workouts { get; set; } = new List<Workout>();
+
+        public Workout CreateWorkout(Workout workout, Athlete athlete)
+        {
+            Console.WriteLine("Create workout in DAL");
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "INSERT INTO Workout (Date) VALUES (@Date); SELECT SCOPE_IDENTITY();";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@Date", workout.Date);
+                    int workoutId = Convert.ToInt32(command.ExecuteScalar());
+                    workout.Id = workoutId;
+
+                    string personWorkoutQuery = "INSERT INTO PersonWorkout(personId, workoutId) VALUES(@personId, @workoutId);";
+                    using (SqlCommand personWorkoutCommand = new SqlCommand(personWorkoutQuery, connection))
+                    {
+                        personWorkoutCommand.Parameters.AddWithValue("@personId", athlete.Id);
+                        personWorkoutCommand.Parameters.AddWithValue("@workoutId", workout.Id);
+                        personWorkoutCommand.ExecuteScalar();
+                        Console.WriteLine("inserted into personworkout");
+
+                    }
+                }
+            }
+            return workout;
+        }
 
         public List<Workout> ReadWorkouts(Athlete athlete)
         {
@@ -217,7 +277,6 @@ namespace Zuydfit.DataAccessLayer
 
             return Workouts;
         }
-
 
         public Workout ReadWorkout(Workout workout)
         {
@@ -299,62 +358,6 @@ namespace Zuydfit.DataAccessLayer
             return newWorkout;
         }
 
-        public List<Exercise> ReadExerciseListFromAthlete(Athlete athlete)
-        {
-            List<Exercise> exercises = new List<Exercise>();
-
-            using SqlConnection connection = new(connectionString);
-            connection.Open();
-            string productQuery = "select exercise.Id, exercise.Name, exercise.Type, exercise.duration, exercise.Distance, exercise.MachineId, sets.id, sets.Weight, sets.Reps  from personWorkout\r\ninner join workout on workout.id = personWorkout.workoutid\r\ninner join ExerciseWorkout on ExerciseWorkout.workoutid = workout.id\r\ninner join exercise on exercise.id = exerciseWorkout.ExerciseID\r\ninner join exerciseSet on exerciseSet.setId = setid\r\ninner join sets on exerciseset.SetId = sets.Id " +
-                "where personWorkout.personid = @id";
-            using SqlCommand command = new(productQuery, connection);
-            command.Parameters.AddWithValue("@Id", athlete.Id);
-            command.ExecuteNonQuery();
-
-            using SqlDataReader reader = command.ExecuteReader();
-            Exercise previousExercise = new Strength(0, "");
-            while (reader.Read())
-            {
-                int exerciseId = Convert.ToInt32(reader[0]);
-                string name = reader[1].ToString();
-                string type = reader[2].ToString();
-                if (type.ToLower() == "strength")
-                {
-                    if (previousExercise.Id != exerciseId)
-                    {
-                        Strength strengthExercise = new Strength(exerciseId, name, []);
-                        exercises.Add(strengthExercise);
-                        previousExercise = strengthExercise;
-                    }
-                    if (reader[5] != DBNull.Value)
-                    {
-                        int machineId = Convert.ToInt32(reader[5]);
-                    }
-                    if (reader[7] != DBNull.Value)
-                    {
-                        int setId = Convert.ToInt32(reader[6]);
-                        int weight = Convert.ToInt32(reader[7]);
-                        int amount = Convert.ToInt32(reader[8]);
-                        Sets set = new Sets(setId, amount, weight);
-                        Strength previousStrengthExercise = previousExercise as Strength;
-                        previousStrengthExercise.Sets.Add(set);
-                    }
-                }
-                else if (type.ToLower() == "cardio")
-                {
-                    string duration = reader[3].ToString();
-                    string distance = reader[4].ToString();
-                    if (previousExercise.Id != exerciseId)
-                    {
-                        Cardio cardioExercise = new Cardio(exerciseId, name, duration, distance);
-                        exercises.Add(cardioExercise);
-                        previousExercise = cardioExercise;
-                    }
-                }
-            }
-            return exercises;
-        }
-
         public bool DeleteWorkout(Workout workout)
         {
             try
@@ -377,6 +380,15 @@ namespace Zuydfit.DataAccessLayer
             }
 
         }
+
+        public Workout DuplicateWorkout(Workout workout, Athlete athlete)
+        {
+            Workout duplicatedWorkout = workout.CreateWorkout(workout, athlete);
+            return duplicatedWorkout;
+
+        }
+
+        /* Activity */
         public Activity CreateActivity(Activity activity)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -393,6 +405,7 @@ namespace Zuydfit.DataAccessLayer
                 }
             }
         }
+
         public Activity ReadActivity(int id)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -492,6 +505,21 @@ namespace Zuydfit.DataAccessLayer
             }
         }
 
+        public void AddAthleteToActivity(Activity activity, Athlete athlete)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string query = "INSERT INTO PersonActivity (PersonID, ActivityID) VALUES (@PersonID, @ActivityID)";
+                using (SqlCommand command = new SqlCommand(query, connection))
+                {
+                    command.Parameters.AddWithValue("@PersonID", athlete.Id);
+                    command.Parameters.AddWithValue("@ActivityID", activity.Id);
+                    command.ExecuteNonQuery();
+                }
+            }
+        }
+
         public void DeleteActivity(Activity activity)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -505,10 +533,10 @@ namespace Zuydfit.DataAccessLayer
                 }
             }
         }
-        
 
-        
+        /* Machines */
         public List<Machine> Machines { get; set; } = new List<Machine>();
+
         public List<Machine> ReadMachines()
         {
 
@@ -589,22 +617,6 @@ namespace Zuydfit.DataAccessLayer
             return machine;
         }
 
-        public Machine UpdateMachineLocation(Machine machine) 
-        {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-                string sql = "UPDATE MachineLocation SET LocationId = @LocationId WHERE Id = @Id";
-                SqlCommand command = new SqlCommand(sql, connection);
-                command.Parameters.AddWithValue("@Id", machine.Id);
-                command.Parameters.AddWithValue("@LocationId", machine.Location.Id);
-
-                command.ExecuteNonQuery();
-            }
-
-            return machine;
-        }
-
         public bool DeleteMachine(Machine machine)
         {
             int rowsAffected = 0;
@@ -621,6 +633,22 @@ namespace Zuydfit.DataAccessLayer
             return rowsAffected > 0;
         }
 
+        /* Location */
+        public Machine UpdateMachineLocation(Machine machine) 
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = "UPDATE MachineLocation SET LocationId = @LocationId WHERE Id = @Id";
+                SqlCommand command = new SqlCommand(sql, connection);
+                command.Parameters.AddWithValue("@Id", machine.Id);
+                command.Parameters.AddWithValue("@LocationId", machine.Location.Id);
+
+                command.ExecuteNonQuery();
+            }
+
+            return machine;
+        }
 
         public List<Location> ReadLocations()
         {
@@ -700,6 +728,7 @@ namespace Zuydfit.DataAccessLayer
 
             return location;
         }
+
         public bool DeleteLocation(int locationId)
         {
             int rowsAffected = 0;
@@ -724,10 +753,7 @@ namespace Zuydfit.DataAccessLayer
             return rowsAffected > 0;
         }
 
-        /// <summary>
-        /// Get a list of persons from the database.
-        /// </summary>
-        /// <returns></returns>
+        /* Person */
         public List<Person> GetPerson()
         {
             List<Person> persons = new List<Person>();
@@ -783,9 +809,6 @@ namespace Zuydfit.DataAccessLayer
             return persons;
         }
 
-        /// <summary>
-        /// Create a person in the database.
-        /// </summary>
         public void CreatePerson(Person person)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -853,24 +876,6 @@ namespace Zuydfit.DataAccessLayer
             }
         }
 
-        public void AddAthleteToActivity(Activity activity, Athlete athlete)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-                string query = "INSERT INTO PersonActivity (PersonID, ActivityID) VALUES (@PersonID, @ActivityID)";
-                using (SqlCommand command = new SqlCommand(query, connection))
-                {
-                    command.Parameters.AddWithValue("@PersonID", athlete.Id);
-                    command.Parameters.AddWithValue("@ActivityID", activity.Id);
-                    command.ExecuteNonQuery();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Update a person in the database.
-        /// </summary>
         public void UpdatePerson(Person person)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -948,9 +953,6 @@ namespace Zuydfit.DataAccessLayer
             }
         }
 
-        /// <summary>
-        /// Deletes a person from the database.
-        /// </summary>
         public bool DeletePerson(Person person)
         {
             try
@@ -978,7 +980,6 @@ namespace Zuydfit.DataAccessLayer
             }
         }
 
-
         public Location UpdateLocation(Location location)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -994,6 +995,7 @@ namespace Zuydfit.DataAccessLayer
             }
         }
 
+        /* Sets */
         public Sets CreateSet(Sets sets)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -1070,6 +1072,8 @@ namespace Zuydfit.DataAccessLayer
                 }
             }
         }
+
+        /* Feedback */
         public Feedback CreateFeedback(Feedback feedback)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -1086,7 +1090,6 @@ namespace Zuydfit.DataAccessLayer
             }
             return feedback;
         }
-
 
         public Feedback ReadFeedback(int feedbackId)
         {
@@ -1140,6 +1143,7 @@ namespace Zuydfit.DataAccessLayer
             }
             return feedbacks;
         }
+
         public Feedback UpdateFeedback(Feedback feedback)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -1157,7 +1161,6 @@ namespace Zuydfit.DataAccessLayer
             }
             return feedback;
         }
-
 
         public bool DeleteFeedback(int feedbackId)
         {

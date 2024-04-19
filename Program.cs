@@ -61,6 +61,7 @@ namespace Zuydfit
             List<string> options = [
                 "View workouts",
                 "New workout",
+                "Duplicate workout",
                 "My progression",
                 "View feedback",
                 "View activities",
@@ -79,18 +80,22 @@ namespace Zuydfit
                     AthleteCreateWorkout(athlete);
                     break;
                 case 3:
-                    // Progression
-                    CoachAthleteProgression(athlete);
+                    // Duplicate workout
+                    AthleteDuplicateWorkout(athlete);
                     break;
                 case 4:
+                    // Progression
+                    AthleteProgression(athlete);
+                    break;
+                case 5:
                     // Instructor feedback
                     AthleteFeedback(athlete);
                     break;
-                case 5:
+                case 6:
                     // Join activity
                     AthleteViewActivities(athlete);
                     break;
-                case 6:
+                case 7:
                     // Join activity
                     AthleteJoinActivity(athlete);
                     break;
@@ -156,8 +161,9 @@ namespace Zuydfit
             }
         }
 
-        public static void CoachAthleteProgression(Athlete athlete)
+        public static void AthleteProgression(Athlete athlete)
         {
+            Console.Clear();
             List<string> options = [
                 "Go back",
             ];
@@ -198,7 +204,7 @@ namespace Zuydfit
             Console.WriteLine(">");
 
 
-            int choice = DisplayMenuOptions(options, "View your progression", null, false);
+            int choice = DisplayMenuOptions(options, "", null, false);
 
             if (choice == 1)
             {
@@ -207,6 +213,36 @@ namespace Zuydfit
             else
             {
                 Console.WriteLine("Invalid choice");
+            }
+        }
+
+        public static void AthleteDuplicateWorkout(Athlete athlete)
+        {
+            List<string> options = [
+                "Go back",
+            ];
+
+            List<Workout> workouts = Workout.ReadWorkouts(athlete);
+            foreach (Workout workout in workouts)
+            {
+                options.Add(workout.Date.ToString("dd/MM/yyyy"));
+            }
+
+
+            int choice = DisplayMenuOptions(options, "Choose a workout to duplicate");
+
+            if (choice == 1)
+            {
+                AthleteMainMenu(athlete);
+            }
+            else
+            {
+                Workout chosenWorkout = workouts[choice - 2];
+                Console.WriteLine("chosenWorkout.Date");
+                Console.WriteLine(chosenWorkout.Date);
+                Workout duplicatedWorkout = chosenWorkout.DuplicateWorkout(athlete);
+                AthleteSingleWorkout(athlete, duplicatedWorkout);
+
             }
         }
 
