@@ -673,7 +673,11 @@ namespace Zuydfit
                 "Show locations",
                 "Show machines",
                 "Show Location of machines",
-                "Exit"
+                "Add location",
+                "Delete location",
+                "Add machine",
+                "Delete machine",
+                "Main menu"
                 };
                 int choice = DisplayMenuOptions(options, "Administrator Menu");
 
@@ -701,6 +705,18 @@ namespace Zuydfit
                         AdministratorReadMachineLocation();
                         break;
                     case 8:
+                        CreateLocation();
+                        break;
+                    case 9:
+                        DeleteLocation();
+                        break;
+                    case 10:
+                        CreateMachine();
+                        break;
+                    case 11:
+                        DeleteMachine();
+                        break;
+                    case 12:
                         exit = true;
                         break;
                     default:
@@ -712,10 +728,113 @@ namespace Zuydfit
             }
             MainMenu(null);
         }
+        
+        public static void DeleteMachine()
+        {
+            Console.Clear();
+            Console.WriteLine("Deleting a machine:");
+
+            Console.WriteLine("Select the machine to delete:");
+
+            List<Machine> machines = Machine.ReadMachines();
+            foreach (Machine machine in machines)
+            {
+                Console.WriteLine($"Machine: {machine.Id} - {machine.Name}");
+            }
+
+            if (machines.Count == 0)
+            {
+                Console.WriteLine("No machines available to delete.");
+                Console.WriteLine("Go back.");
+                Console.ReadKey();
+                return;
+            }
+
+            Console.WriteLine("Enter the number of the machine to delete: ");
+            int id = Convert.ToInt32(Console.ReadLine());
+            Machine machineToDelete = machines.Find(m => m.Id == id);
+            machineToDelete.DeleteMachine(machineToDelete);
+
+            Console.WriteLine("Machine deleted successfully.");
+            Console.WriteLine("Go back.");
+            Console.ReadKey();
+        }
+        public static void CreateMachine()
+        {
+            Console.Clear();
+            Console.WriteLine("Adding a new machine:");
+
+            Console.Write("Enter machine name: ");
+            string name = Console.ReadLine();
+            
+
+            Machine newMachine = new Machine(1, name);
+            newMachine.CreateMachine(newMachine);
+            Console.WriteLine("Machine Created Successfully!");
+
+            Console.WriteLine("Go back");
+            Console.ReadKey();
+
+            AdministratorMainMenu();
+        }
+        public static void DeleteLocation()
+        {
+            Console.Clear();
+            Console.WriteLine("Deleting a location:");
+
+            Console.WriteLine("Select the location to delete:");
+
+            List<Location> locations = Location.ReadLocations();
+            foreach (Location location in locations)
+            {
+                Console.WriteLine($"Location: {location.Id} - {location.Name}");
+            }
+
+            if (locations.Count == 0)
+            {
+                Console.WriteLine("No locations available to delete.");
+                Console.WriteLine("Go back");
+                Console.ReadKey();
+                return;
+            }
+
+            Console.WriteLine("Enter the number of the location to delete: ");
+            int id = Convert.ToInt32(Console.ReadLine());
+            Location locationToDelete = locations.Find(l => l.Id == id);
+            locationToDelete.DeleteLocation(locationToDelete);
+
+            Console.WriteLine("Location deleted successfully.");
+            Console.WriteLine("Go back");
+            Console.ReadKey();
+        }
+        public static void CreateLocation()
+        {
+            Console.Clear();
+            Console.WriteLine("Adding a new location:");
+
+            Console.Write("Enter location name: ");
+            string name = Console.ReadLine();
+            Console.Write("Enter street name: ");
+            string streetName = Console.ReadLine();
+            Console.Write("Enter house number: ");
+            string houseNumber = Console.ReadLine();
+            Console.Write("Enter postal code: ");
+            string postalCode = Console.ReadLine();
+
+            Location newLocation = new Location(1, name, streetName, houseNumber, postalCode, []);
+            newLocation.CreateLocation(newLocation);
+            Console.WriteLine("Location Created Successfully!");
+
+            Console.WriteLine("Go back");
+            Console.ReadKey();
+
+            AdministratorMainMenu();
+        }
         public static void AdministratorReadMachineLocation()
         {
             Console.Clear();
             List<Location> locations = Location.ReadMachineLocations();
+            Console.WriteLine("Machine locations:");
             foreach (Location location in locations)
             {
                 Console.WriteLine($"Location: {location.Id} - {location.Name}");
@@ -724,7 +843,7 @@ namespace Zuydfit
                     Console.WriteLine($"  Machine: {machine.Id} - {machine.Name}");
                 }
             }
-            Console.WriteLine("\nPress any key to return to the menu...");
+            Console.WriteLine("Go back");
             Console.ReadKey();
         }
         public static void ReadMachines()
@@ -737,7 +856,7 @@ namespace Zuydfit
                 Console.WriteLine($"Machine ID = {machine.Id} Name = {machine.Name}");
             }
 
-            Console.WriteLine("\nPress any key to return to the menu...");
+            Console.WriteLine("Go back");
             Console.ReadKey();
         }
 
@@ -752,7 +871,7 @@ namespace Zuydfit
             }
 
    
-            Console.WriteLine("\nPress any key to return to the menu...");
+            Console.WriteLine("Go back");
             Console.ReadKey();
         }
 
@@ -771,7 +890,7 @@ namespace Zuydfit
                 }
             }
 
-            Console.WriteLine("Press any key to go back.");
+            Console.WriteLine("Go back");
             Console.ReadKey();
         }
 
@@ -801,7 +920,7 @@ namespace Zuydfit
 
 
             Console.WriteLine("Coach added successfully.");
-            Console.WriteLine("Press any key to continue.");
+            Console.WriteLine("Go back");
             Console.ReadKey();
         }
 
@@ -824,7 +943,7 @@ namespace Zuydfit
             if (persons.Count == 0)
             {
                 Console.WriteLine("No coaches available to delete.");
-                Console.WriteLine("Press any key to go back.");
+                Console.WriteLine("Go back");
                 Console.ReadKey();
                 return;
             }
@@ -836,7 +955,7 @@ namespace Zuydfit
             personToUpdate.DeletePerson();
 
             Console.WriteLine("Coach deleted successfully.");
-            Console.WriteLine("Press any key to continue.");
+            Console.WriteLine("Go back");
             Console.ReadKey();
         }
 
