@@ -598,7 +598,50 @@ namespace Zuydfit.DataAccessLayer
 
             return rowsAffected > 0;
         }
+        public List<Location> ReadMachineLocations()
+        {
+            List<Location> locations = new List<Location>();
 
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = "SELECT * FROM Location " +
+                    "Join MachineLocation on Location.Id = MachineLocation.LocationId " +
+                    "Join Machine on MachineLocation.MachineId = Machine.Id";
+                SqlCommand command = new SqlCommand(sql, connection);
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Machine machine = new Machine(reader.GetInt32(7), reader.GetString(8));
+
+                        if (locations.Any(location => location.Id == reader.GetInt32(0)))
+                        {
+                            Location location = locations.Find(location => location.Id == reader.GetInt32(0));
+                            
+                            location.Machines.Add(machine);
+                        }
+                        else
+                        {
+                            //locations.Add
+                            Location newlocation = new Location(
+                            reader.GetInt32(0),
+                            reader.GetString(1),
+                            reader.GetString(2),
+                            reader.GetString(3),
+                            reader.GetString(4)
+                        );
+                            newlocation.Machines.Add(machine);
+                            locations.Add(newlocation);
+                        }
+                        
+                    }
+                }
+            }
+
+            return locations;
+        }
 
         public List<Location> ReadLocations()
         {
@@ -606,7 +649,7 @@ namespace Zuydfit.DataAccessLayer
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string sql = "SELECT Id, Name, Streetname, Housenumber, Postalcode FROM Location";
+                string sql = "SELECT Id, Name, Streetname, Housenumber, Postalcode FROM Location"; 
                 SqlCommand command = new SqlCommand(sql, connection);
 
                 using (SqlDataReader reader = command.ExecuteReader())
@@ -1055,33 +1098,60 @@ namespace Zuydfit.DataAccessLayer
             return feedback;
         }
 
-
-        public Feedback ReadFeedback(int feedbackId)
+        public Feedback CreatePersonFeedback(int personId, int feedbackId)
         {
-            Feedback feedback = null;
-
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string query = "SELECT Id, FeedbackMessage, Date FROM Feedback WHERE Id = @Id";
+                string query = "INSERT INTO PersonFeedback (PersonID, FeedbackID) VALUES (@PersonID, @FeedbackID);";
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
-                    command.Parameters.AddWithValue("@Id", feedbackId);
-
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            int id = reader.GetInt32(0);
-                            string message = reader.IsDBNull(1) ? null : reader.GetString(1);
-                            DateTime date = reader.IsDBNull(2) ? DateTime.MinValue : reader.GetDateTime(2);
-                            feedback = new Feedback(id, message, date);
-                        }
-                    }
+                    command.Parameters.AddWithValue("@PersonID", personId);
+                    command.Parameters.AddWithValue("@FeedbackID", feedbackId);
+                    command.ExecuteNonQuery();
                 }
             }
-            return feedback;
+            return null;
         }
+
+        public List<Feedback> ReadFeedback(int Id)
+        {
+            try
+            {
+                List<Feedback> results = new List<Feedback>(); // Create a new list to store the feedback objects
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string query = "SELECT feedback.Id, feedback.FeedbackMessage, feedback.Date FROM Feedback " +
+                        "JOIN PersonFeedback ON PersonFeedback.FeedbackID = Feedback.Id " +
+                        "JOIN Person ON Person.Id = PersonFeedback.PersonID WHERE Person.Id = @Id";
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", Id);
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                int id = reader.GetInt32(0);
+                                string message =  reader.GetString(1);
+                                DateTime date = reader.GetDateTime(2);
+                                Feedback feedback = new Feedback(id, message, date); // Create a new feedback object
+                                results.Add(feedback); // Add the feedback object to the list
+                            }
+                        }
+                    }
+                    return results; // Return the list of feedback objects
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred while reading the feedback: " + ex.Message);
+                return null;
+            }
+        }
+
 
         public List<Feedback> ReadAllFeedback()
         {
