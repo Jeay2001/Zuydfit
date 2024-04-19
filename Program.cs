@@ -70,8 +70,11 @@ namespace Zuydfit
             List<string> options = [
                 "View workouts",
                 "New workout",
+                "Duplicate workout",
                 "My progression",
-                "View feedback"
+                "View feedback",
+                "View activities",
+                "Join activity",
             ];
             int choice = DisplayMenuOptions(options, "Main menu, choose one of the options");
 
@@ -86,12 +89,24 @@ namespace Zuydfit
                     AthleteCreateWorkout(athlete);
                     break;
                 case 3:
-                    // Progression
-                    CoachAthleteProgression(athlete);
+                    // Duplicate workout
+                    AthleteDuplicateWorkout(athlete);
                     break;
                 case 4:
+                    // Progression
+                    AthleteProgression(athlete);
+                    break;
+                case 5:
                     // Instructor feedback
                     AthleteFeedback(athlete);
+                    break;
+                case 6:
+                    // Join activity
+                    AthleteViewActivities(athlete);
+                    break;
+                case 7:
+                    // Join activity
+                    AthleteJoinActivity(athlete);
                     break;
                 default:
                     Console.WriteLine("Invalid choice");
@@ -155,8 +170,9 @@ namespace Zuydfit
             }
         }
 
-        public static void CoachAthleteProgression(Athlete athlete)
+        public static void AthleteProgression(Athlete athlete)
         {
+            Console.Clear();
             List<string> options = [
                 "Go back",
             ];
@@ -197,7 +213,7 @@ namespace Zuydfit
             Console.WriteLine(">");
 
 
-            int choice = DisplayMenuOptions(options, "View your progression", null, false);
+            int choice = DisplayMenuOptions(options, "", null, false);
 
             if (choice == 1)
             {
@@ -206,6 +222,36 @@ namespace Zuydfit
             else
             {
                 Console.WriteLine("Invalid choice");
+            }
+        }
+
+        public static void AthleteDuplicateWorkout(Athlete athlete)
+        {
+            List<string> options = [
+                "Go back",
+            ];
+
+            List<Workout> workouts = Workout.ReadWorkouts(athlete);
+            foreach (Workout workout in workouts)
+            {
+                options.Add(workout.Date.ToString("dd/MM/yyyy"));
+            }
+
+
+            int choice = DisplayMenuOptions(options, "Choose a workout to duplicate");
+
+            if (choice == 1)
+            {
+                AthleteMainMenu(athlete);
+            }
+            else
+            {
+                Workout chosenWorkout = workouts[choice - 2];
+                Console.WriteLine("chosenWorkout.Date");
+                Console.WriteLine(chosenWorkout.Date);
+                Workout duplicatedWorkout = chosenWorkout.DuplicateWorkout(athlete);
+                AthleteSingleWorkout(athlete, duplicatedWorkout);
+
             }
         }
 
@@ -230,6 +276,58 @@ namespace Zuydfit
             else
             {
                 Console.WriteLine("Invalid choice");
+            }
+        }
+
+        public static void AthleteViewActivities(Athlete athlete)
+        {
+            List<string> options = new List<string>
+            {
+                "Go back",
+            };
+            List<Activity> activities = Activity.ReadAthleteActivities(athlete);
+            foreach (Activity activity in activities)
+            {
+                Console.WriteLine($"Activity: {activity.Id} - {activity.Name} - {activity.Duration}");
+                options.Add(activity.Name);
+            }
+
+            int choice = DisplayMenuOptions(options, "Choose an activity to join");
+
+            if (choice == 1)
+            {
+                AthleteMainMenu(athlete);
+            }
+            else
+            {
+                Activity chosenActivity = activities[choice - 2];
+                chosenActivity.AddAthlete(athlete);
+                AthleteViewActivities(athlete);
+            }
+        }
+
+        public static void AthleteJoinActivity(Athlete athlete)
+        {
+            Console.Clear();
+            List<Activity> activities = Activity.ReadAllActivities();
+            List<string> options = new List<string>
+            {
+                "Go back",
+            };
+            foreach (Activity activity in activities)
+            {
+                options.Add(activity.Name);
+            }
+            int choice = DisplayMenuOptions(options, "Choose an activity to join");
+
+            if (choice == 1) { 
+                // Previous menu
+                AthleteMainMenu(athlete);
+            } else
+            {
+                Activity chosenActivity = activities[choice - 2];
+                chosenActivity.AddAthlete(athlete);
+                AthleteJoinActivity(athlete);
             }
         }
 
@@ -316,7 +414,6 @@ namespace Zuydfit
             }
             else if (exerciseType == "cardio")
             {
-                // To do - cardio
                 Console.Write("Exercise duration (leave empty if needed): ");
                 string duration = Console.ReadLine();
                 Console.Write("Exercise distance (leave empty if needed): ");
@@ -326,7 +423,6 @@ namespace Zuydfit
                 newExercise.CreateExercise(workout, newExercise);
                 return newExercise;
             }
-            // To do - exercise type controleren
             return new Strength(0, "test");
         }
 
@@ -504,10 +600,24 @@ namespace Zuydfit
 
         public static void CoachViewAllActivities()
         {
+            Console.Clear();
             List<Activity> activities = Activity.ReadAllActivities();
             foreach (Activity activity in activities)
             {
                 Console.WriteLine($"Activity: {activity.Id} - {activity.Name} - {activity.Duration}");
+            }
+
+            List<string> options = new List<string> {
+                "Go back",
+            };
+
+            int choice = DisplayMenuOptions(options, "", null, false);
+
+            switch (choice)
+            {
+                case 1:
+                    CoachMainMenu();
+                    break;
             }
         }
 
@@ -525,7 +635,7 @@ namespace Zuydfit
             newActivity.CreateActivity();
             Console.WriteLine("Activity Created Succesfully!");
 
-            CoachMainMenu();
+            CoachViewAllActivities();
         }
 
         public static void CoachAthleteProgression()
@@ -630,8 +740,19 @@ namespace Zuydfit
             }
 
             Console.WriteLine("");
-            Console.WriteLine("Press any key to go back.");
-            Console.ReadKey();
+
+            List<string> options = new List<string> {
+                "Go back",
+            };
+
+            int choice = DisplayMenuOptions(options, "", null, false);
+
+            switch (choice)
+            {
+                case 1:
+                    CoachMainMenu();
+                    break;
+            }
 
             CoachMainMenu();
         }
@@ -663,6 +784,8 @@ namespace Zuydfit
             Console.WriteLine("Feedback Created Succesfully!");
 
 
+            newFeedback.CreateFeedback();
+            CoachMainMenu();
         }
 
 
@@ -681,7 +804,11 @@ namespace Zuydfit
                 "Show locations",
                 "Show machines",
                 "Show Location of machines",
-                "Exit"
+                "Add location",
+                "Delete location",
+                "Add machine",
+                "Delete machine",
+                "Main menu"
                 };
                 int choice = DisplayMenuOptions(options, "Administrator Menu");
 
@@ -709,6 +836,18 @@ namespace Zuydfit
                         AdministratorReadMachineLocation();
                         break;
                     case 8:
+                        CreateLocation();
+                        break;
+                    case 9:
+                        DeleteLocation();
+                        break;
+                    case 10:
+                        CreateMachine();
+                        break;
+                    case 11:
+                        DeleteMachine();
+                        break;
+                    case 12:
                         exit = true;
                         break;
                     default:
@@ -720,10 +859,113 @@ namespace Zuydfit
             }
             MainMenu(null);
         }
+        
+        public static void DeleteMachine()
+        {
+            Console.Clear();
+            Console.WriteLine("Deleting a machine:");
+
+            Console.WriteLine("Select the machine to delete:");
+
+            List<Machine> machines = Machine.ReadMachines();
+            foreach (Machine machine in machines)
+            {
+                Console.WriteLine($"Machine: {machine.Id} - {machine.Name}");
+            }
+
+            if (machines.Count == 0)
+            {
+                Console.WriteLine("No machines available to delete.");
+                Console.WriteLine("Go back.");
+                Console.ReadKey();
+                return;
+            }
+
+            Console.WriteLine("Enter the number of the machine to delete: ");
+            int id = Convert.ToInt32(Console.ReadLine());
+            Machine machineToDelete = machines.Find(m => m.Id == id);
+            machineToDelete.DeleteMachine(machineToDelete);
+
+            Console.WriteLine("Machine deleted successfully.");
+            Console.WriteLine("Go back.");
+            Console.ReadKey();
+        }
+        public static void CreateMachine()
+        {
+            Console.Clear();
+            Console.WriteLine("Adding a new machine:");
+
+            Console.Write("Enter machine name: ");
+            string name = Console.ReadLine();
+            
+
+            Machine newMachine = new Machine(1, name);
+            newMachine.CreateMachine(newMachine);
+            Console.WriteLine("Machine Created Successfully!");
+
+            Console.WriteLine("Go back");
+            Console.ReadKey();
+
+            AdministratorMainMenu();
+        }
+        public static void DeleteLocation()
+        {
+            Console.Clear();
+            Console.WriteLine("Deleting a location:");
+
+            Console.WriteLine("Select the location to delete:");
+
+            List<Location> locations = Location.ReadLocations();
+            foreach (Location location in locations)
+            {
+                Console.WriteLine($"Location: {location.Id} - {location.Name}");
+            }
+
+            if (locations.Count == 0)
+            {
+                Console.WriteLine("No locations available to delete.");
+                Console.WriteLine("Go back");
+                Console.ReadKey();
+                return;
+            }
+
+            Console.WriteLine("Enter the number of the location to delete: ");
+            int id = Convert.ToInt32(Console.ReadLine());
+            Location locationToDelete = locations.Find(l => l.Id == id);
+            locationToDelete.DeleteLocation(locationToDelete);
+
+            Console.WriteLine("Location deleted successfully.");
+            Console.WriteLine("Go back");
+            Console.ReadKey();
+        }
+        public static void CreateLocation()
+        {
+            Console.Clear();
+            Console.WriteLine("Adding a new location:");
+
+            Console.Write("Enter location name: ");
+            string name = Console.ReadLine();
+            Console.Write("Enter street name: ");
+            string streetName = Console.ReadLine();
+            Console.Write("Enter house number: ");
+            string houseNumber = Console.ReadLine();
+            Console.Write("Enter postal code: ");
+            string postalCode = Console.ReadLine();
+
+            Location newLocation = new Location(1, name, streetName, houseNumber, postalCode, []);
+            newLocation.CreateLocation(newLocation);
+            Console.WriteLine("Location Created Successfully!");
+
+            Console.WriteLine("Go back");
+            Console.ReadKey();
+
+            AdministratorMainMenu();
+        }
         public static void AdministratorReadMachineLocation()
         {
             Console.Clear();
             List<Location> locations = Location.ReadMachineLocations();
+            Console.WriteLine("Machine locations:");
             foreach (Location location in locations)
             {
                 Console.WriteLine($"Location: {location.Id} - {location.Name}");
@@ -732,7 +974,7 @@ namespace Zuydfit
                     Console.WriteLine($"  Machine: {machine.Id} - {machine.Name}");
                 }
             }
-            Console.WriteLine("\nPress any key to return to the menu...");
+            Console.WriteLine("Go back");
             Console.ReadKey();
         }
         public static void ReadMachines()
@@ -745,7 +987,7 @@ namespace Zuydfit
                 Console.WriteLine($"Machine ID = {machine.Id} Name = {machine.Name}");
             }
 
-            Console.WriteLine("\nPress any key to return to the menu...");
+            Console.WriteLine("Go back");
             Console.ReadKey();
         }
 
@@ -760,7 +1002,7 @@ namespace Zuydfit
             }
 
    
-            Console.WriteLine("\nPress any key to return to the menu...");
+            Console.WriteLine("Go back");
             Console.ReadKey();
         }
 
@@ -779,7 +1021,7 @@ namespace Zuydfit
                 }
             }
 
-            Console.WriteLine("Press any key to go back.");
+            Console.WriteLine("Go back");
             Console.ReadKey();
         }
 
@@ -809,7 +1051,7 @@ namespace Zuydfit
 
 
             Console.WriteLine("Coach added successfully.");
-            Console.WriteLine("Press any key to continue.");
+            Console.WriteLine("Go back");
             Console.ReadKey();
         }
 
@@ -832,7 +1074,7 @@ namespace Zuydfit
             if (persons.Count == 0)
             {
                 Console.WriteLine("No coaches available to delete.");
-                Console.WriteLine("Press any key to go back.");
+                Console.WriteLine("Go back");
                 Console.ReadKey();
                 return;
             }
@@ -844,7 +1086,7 @@ namespace Zuydfit
             personToUpdate.DeletePerson();
 
             Console.WriteLine("Coach deleted successfully.");
-            Console.WriteLine("Press any key to continue.");
+            Console.WriteLine("Go back");
             Console.ReadKey();
         }
 
