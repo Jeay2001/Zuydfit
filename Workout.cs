@@ -27,6 +27,13 @@ namespace Zuydfit
             Exercises = exercises;
         }
 
+        public Workout DuplicateWorkout(Athlete athlete)
+        {
+            DAL dal = new DAL();
+            Workout duplicatedWorkout = dal.DuplicateWorkout(this, athlete);
+            return duplicatedWorkout;
+        }
+
         public static List<Workout> ReadWorkouts(Athlete athlete)
         {
             DAL dal = new DAL();
