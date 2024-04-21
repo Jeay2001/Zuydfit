@@ -11,7 +11,11 @@ namespace Zuydfit.DataAccessLayer
 {
     public class DAL
     {
+        //connection string voor azure database: (werkt alleen op internet van zuyd hogeschool heerlen)
         private readonly string connectionString = "Data Source=sqlserverjeaysnijders.database.windows.net; Initial Catalog = Zuydfit; User ID = Jeay2001; Password=Snijders2208@";
+
+        //connection string voor lokale database:
+        //private readonly string connectionString = "Data Source=.;Initial Catalog=Kassasysteem;Integrated Security=true";
 
         /* Exercise */
         public Exercise CreateExercise(Workout workout, Exercise exercise)

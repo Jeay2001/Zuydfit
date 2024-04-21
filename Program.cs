@@ -916,8 +916,15 @@ namespace Zuydfit
             machineToDelete.DeleteMachine(machineToDelete);
 
             Console.WriteLine("Machine deleted successfully.");
-            Console.WriteLine("Go back.");
-            Console.ReadKey();
+            List<string> options = new List<string>
+            {
+                "Go back",
+            };
+            int choice = DisplayMenuOptions(options, "", null, false);
+            if (choice == 1)
+            {
+                AdministratorMainMenu();
+            }
         }
 
         public static void CreateMachine()
@@ -967,7 +974,16 @@ namespace Zuydfit
 
             Console.WriteLine("Location deleted successfully.");
             Console.WriteLine("Go back");
-            Console.ReadKey();
+
+            List<string> options = new List<string>
+            {
+                "Go back",
+            };
+            int choice = DisplayMenuOptions(options, "", null, false);
+            if (choice == 1)
+            {
+                AdministratorMainMenu();
+            }
         }
         
         public static void CreateLocation()
