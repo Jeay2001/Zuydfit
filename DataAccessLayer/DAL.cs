@@ -524,24 +524,34 @@ namespace Zuydfit.DataAccessLayer
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                connection.Open();
-                string query = "SELECT activity.Id, Name, Duration FROM Activity\r\nfull join PersonActivity on Activity.Id = PersonActivity.ActivityId\r\nfull join Person on PersonActivity.PersonId = Person.Id " +
-                    "where person.id = @personId";
-                using (SqlCommand command = new SqlCommand(query, connection))
+                try 
                 {
-                    command.Parameters.AddWithValue("@personId", athlete.Id);
-                    using (SqlDataReader reader = command.ExecuteReader())
+                    connection.Open();
+                    string query = "SELECT activity.Id, Name, Duration FROM Activity " +
+                        "full join PersonActivity on Activity.Id = PersonActivity.ActivityId " +
+                        "full join Person on PersonActivity.PersonId = Person.Id " +
+                        "where person.id = @personId";
+                    using (SqlCommand command = new SqlCommand(query, connection))
                     {
-                        if (reader.Read())
+                        command.Parameters.AddWithValue("@personId", athlete.Id);
+                        using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            int id = Convert.ToInt32(reader["Id"]);
-                            string name = reader["Name"].ToString();
-                            string duration = reader["Duration"].ToString();
-                            Activity activity = new Activity(id, name, duration, new List<Athlete>());
-                            activities.Add(activity);
+                            if (reader.Read())
+                            {
+                                int id = Convert.ToInt32(reader[0]);
+                                string name = reader["Name"].ToString();
+                                string duration = reader["Duration"].ToString();
+                                Activity activity = new Activity(id, name, duration, new List<Athlete>());
+                                activities.Add(activity);
+                            }
                         }
                     }
                 }
+                catch
+                {
+                    Console.WriteLine("You are not signed in for a activity.");
+                }
+                
             }
             return activities;
         }
@@ -623,17 +633,22 @@ namespace Zuydfit.DataAccessLayer
                             if (!string.IsNullOrEmpty(firstName) && !string.IsNullOrEmpty(lastName))
                             {
                                 Athlete athlete = new Athlete(1, firstName, lastName, "test", "test", "test", location, feedback);
-                                if (activities.Any(activity => activity.Id == reader.GetInt32(0)))
+                                if (!reader.IsDBNull(0))
                                 {
-                                    Activity activity = activities.Find(activity => activity.Id == reader.GetInt32(0));
-                                    activity.Athletes.Add(athlete);
+                                    int activityId = reader.GetInt32(0);
+                                    if (activities.Any(activity => activity.Id == activityId))
+                                    {
+                                        Activity activity = activities.Find(activity => activity.Id == activityId);
+                                        activity.Athletes.Add(athlete);
+                                    }
+                                    else
+                                    {
+                                        Activity newActivity = new Activity(activityId, reader.GetString(1), reader.GetString(2), new List<Athlete>());
+                                        newActivity.Athletes.Add(athlete);
+                                        activities.Add(newActivity);
+                                    }
                                 }
-                                else
-                                {
-                                    Activity newActivity = new Activity(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), new List<Athlete>());
-                                    newActivity.Athletes.Add(athlete);
-                                    activities.Add(newActivity);
-                                }
+                                
                             }
                         }
                     }
