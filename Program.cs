@@ -750,8 +750,6 @@ namespace Zuydfit
         public static void CoachReadAthleteFeedback()
         {
             Console.Clear();
-            Console.WriteLine("Choose a person to view progression:");
-
             List<Person> persons = Person.GetPersons();
 
             foreach (Person person in persons)
@@ -762,19 +760,23 @@ namespace Zuydfit
                 }
             }
 
+            
+            Console.WriteLine("Choose a person to view Feedback:");
             int id = Convert.ToInt32(Console.ReadLine());
-
             Console.Clear();
             if (persons.Find(p => p.Id == id) is Athlete athlete)
             {
                 Console.WriteLine($"Feedback van {athlete.FirstName} {athlete.LastName}:");
                 Console.WriteLine("");
-            }
 
-            List<Feedback> feedbacks = Feedback.ReadAllFeedback();
-            foreach (Feedback feedback in feedbacks)
-            {
-                Console.WriteLine($"Feedback: {feedback.Id} - {feedback.FeedbackMessage} - {feedback.Date}");
+                List<Feedback> feedbacks = Feedback.ReadAllFeedback();
+                foreach (Feedback feedback in feedbacks)
+                {
+                    if (feedback.Id == id)
+                    {
+                        Console.WriteLine($"Feedback: {feedback.Id} - {feedback.FeedbackMessage} - {feedback.Date}");
+                    }
+                }
             }
 
             Console.WriteLine("");
@@ -822,7 +824,6 @@ namespace Zuydfit
             Console.WriteLine("Feedback Created Succesfully!");
 
 
-            newFeedback.CreateFeedback();
             CoachMainMenu();
         }
 
