@@ -17,7 +17,7 @@ namespace Zuydfit
             Location location = new Location(1, "locatie 1", "straatnaam", "huisnummer", "1837jd", []);
             List<Feedback> feedbacks = new List<Feedback>();
 
-            Athlete athlete = new Athlete(4, "John", "Doe", "Street", "1", "1234", [], location, []);
+            Athlete athlete = new Athlete(26, "John", "Doe", "Street", "1", "1234", [], location, []);
 
             //List<Feedback> feedbacks = Feedback.ReadPersonFeedback(athlete.Id);
             //Console.WriteLine("Feedback:");
@@ -838,6 +838,7 @@ namespace Zuydfit
             "Update coach",
             "Show locations",
             "Show machines",
+            "Show machine locations",
             "Add location",
             "Delete location",
             "Add machine",
@@ -860,24 +861,24 @@ namespace Zuydfit
                     AdministratorUpdateCoach();
                     break;
                 case 5:
-                    AdministratorReadMachineLocation();
+                    ReadLocations();
                     break;
                 case 6:
                     ReadMachines();
                     break;
-                //case 7:
-                //    AdministratorReadMachineLocation();
-                //    break;
                 case 7:
-                    CreateLocation();
+                    AdministratorReadMachineLocation();
                     break;
                 case 8:
-                    DeleteLocation();
+                    CreateLocation();
                     break;
                 case 9:
-                    CreateMachine();
+                    DeleteLocation();
                     break;
                 case 10:
+                    CreateMachine();
+                    break;
+                case 11:
                     DeleteMachine();
                     break;
                 default:
